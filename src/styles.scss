@@ -1,1 +1,553 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
+
 /* You can add global styles to this file, and also import other style files */
+/* ============================== */
+/* CLEAN FUTURISTIC HUE */
+/* ============================== */
+
+:root {
+  /* ===== BRAND ACCENT (electric cyan, command-console feel) ===== */
+  --color-accent: #22d3ee;
+  --color-accent-hover: #06b6d4;
+  --color-accent-light: rgba(34, 211, 238, 0.1);
+
+  /* ===== SECONDARY ACCENT (violet, for contrast / secondary actions) ===== */
+  --color-accent-2: #7c5cff;
+  --color-accent-2-hover: #6845e8;
+  --color-accent-2-light: rgba(124, 92, 255, 0.1);
+
+  /* ===== SECONDARY ACCENT (violet, for contrast / secondary actions) ===== */
+  --color-accent-3: #ff5c5c;
+  --color-accent-3-hover: #e84545;
+  --color-accent-3-light: rgba(255, 92, 92, 0.1);
+
+  /* ===== BACKGROUND (deep space navy) ===== */
+  --color-bg-page: #0a0e1a;
+  --color-bg-surface: #10182b;
+  --color-bg-surface-raised: #151f38;
+
+  /* Translucent variant used only for "glass" panels (metric blocks, main-nav) —
+     kept separate from --color-bg-surface so grids/inputs/dialogs
+     stay fully opaque and legible. */
+  --color-panel-glass: rgba(16, 24, 43, 0.55);
+  --panel-blur: blur(14px);
+  --color-bg-surface-glass: rgba(16, 24, 43, 0.55); /* same translucency as .main-nav */
+
+  /* ===== AMBIENT GRADIENT (page backdrop) =====
+     Diagonal sweep: light lavender/periwinkle top-right -> near-black bottom-left,
+     with a soft light bloom layered on top in the top-right corner. */
+  --gradient-page: linear-gradient(
+    135deg,
+    #3a3570 0%,
+    #241f4d 28%,
+    #141433 55%,
+    #0a0b1a 80%,
+    #060712 100%
+  );
+  --glow-corner: radial-gradient(
+    circle at 85% 8%,
+    rgba(124, 92, 255, 0.35) 0%,
+    rgba(34, 211, 238, 0.12) 25%,
+    transparent 55%
+  );
+
+  /* ===== BORDERS ===== */
+  --color-border: #22304d;
+  --color-border-glow: rgba(34, 211, 238, 0.35);
+
+  /* ===== TEXT ===== */
+  --color-text-primary: #e6edf7;
+  --color-text-secondary: #8b98b8;
+  --color-text-tertiary: #ffffff;
+
+  /* ===== STATUS (neon-tinted but legible) ===== */
+  --color-success: #2de8a6;
+  --color-success-2: #166348;
+  --color-success-3: #0c3526;
+  --color-error: #ff4d6d;
+  --color-error-2: #862a3b;
+  --color-error-3: #3d161d;
+  --color-warning: #ffb020;
+  --color-warning-2: #9c6d16;
+  --color-warning-3: #503d1b;
+  --color-info: #22d3ee;
+  --color-info-2: #0c778a;
+  --color-info-3: #173a41;
+
+  /* ===== TYPOGRAPHY ===== */
+  --font-family-main: 'Inter', 'Segoe UI', sans-serif;
+  --font-family-display: 'Space Grotesk', 'Inter', sans-serif;
+
+  --font-size-sm: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+
+  /* ===== SPACING ===== */
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+
+  /* ===== EFFECTS ===== */
+  --glow-accent: 0 0 0 1px var(--color-border-glow), 0 0 16px rgba(34, 211, 238, 0.15);
+  --radius-button: 999px; /* pill shape, matches .main-nav a and .search-input */
+  --radius-input: 10px;
+  --radius-panel: 12px;
+}
+
+/* ================= BASE ================= */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family-main);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  min-height: 100vh;
+  /* Layered background: soft glow bloom on top of the diagonal gradient */
+  background: var(--glow-corner), var(--gradient-page);
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+h1,
+h2,
+h3,
+h4,
+.k-grid-header .k-link,
+.metric-block-label {
+  font-family: var(--font-family-display);
+  letter-spacing: 0.01em;
+}
+
+/* ================= LAYOUT ================= */
+.page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  /* Transparent so the body's diagonal gradient shows through the whole shell */
+  background: transparent;
+}
+
+.main-content {
+  flex: 1;
+  padding: var(--spacing-md);
+  overflow-y: auto;
+}
+
+.toolbar-row {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  margin-bottom: 16px; /* spacing between button and card grid */
+}
+
+/* ================= GLOBAL BUTTONS ================= */
+button.k-button.btn {
+  font-family: var(--font-family-main);
+  font-size: var(--font-size-md);
+  font-weight: 500;
+  border-radius: var(--radius-button);
+  padding: 5px 16px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    box-shadow 0.2s,
+    color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* Primary / Accent Button */
+button.k-button.btn-primary {
+  background-color: var(--tab-color, var(--color-accent));
+  color: #051016;
+}
+
+button.k-button.btn-primary:hover {
+  background-color: var(--tab-color, var(--color-accent-hover));
+  filter: brightness(1.1);
+  box-shadow:
+    0 0 0 1px var(--tab-color, var(--color-border-glow)),
+    0 0 16px color-mix(in srgb, var(--tab-color, var(--color-accent)) 35%, transparent);
+}
+
+/* Secondary / Gray Button (Delete / Cancel) */
+button.k-button.btn-secondary {
+  background-color: var(--color-bg-surface-raised);
+  color: var(--color-text-primary);
+  border-color: var(--color-border);
+}
+
+button.k-button.btn-secondary:hover {
+  background-color: var(--color-accent-2);
+  border-color: var(--color-accent-2);
+  color: #fff;
+}
+
+/* Danger Button (destructive actions: Delete, Remove) */
+button.k-button.btn-danger {
+  background-color: transparent;
+  color: var(--color-error);
+  border-color: var(--color-error);
+}
+
+button.k-button.btn-danger:hover {
+  background-color: var(--color-error);
+  color: #fff;
+  box-shadow: 0 0 16px rgba(255, 77, 109, 0.35);
+}
+
+/* Small Button Variant */
+.btn-sm {
+  font-size: var(--font-size-sm);
+  padding: 3px 10px;
+}
+
+/* Button Group (for multiple buttons together) */
+.button-group {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+/* ================= KENDO OVERRIDES ================= */
+
+/* ----- Grid ----- */
+.k-grid {
+  background-color: var(--color-bg-surface);
+  border-color: var(--color-border);
+}
+
+.k-grid-header {
+  background-color: var(--color-bg-surface-raised);
+  border-color: var(--color-border);
+}
+
+.k-grid-header .k-link {
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.k-grid-content tr {
+  background-color: var(--color-bg-surface);
+  color: var(--color-text-primary);
+}
+
+.k-grid-content tr:hover {
+  background-color: var(--color-accent-light);
+  box-shadow: inset 2px 0 0 var(--color-accent);
+}
+
+/* ----- Drawer ----- */
+.k-drawer-item:hover {
+  background-color: var(--color-accent-light);
+}
+
+.k-drawer-item:hover .k-drawer-item-text,
+.k-drawer-item:hover .k-icon,
+.k-drawer-item:hover kendo-svg-icon {
+  color: var(--color-accent);
+}
+
+/* ----- Upload ----- */
+::ng-deep .k-upload-buttons {
+  display: none;
+}
+
+/* ----- Dialog ----- */
+.k-dialog-titlebar {
+  background-color: var(--color-bg-surface-raised);
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.k-window-content.k-dialog-content {
+  background-color: var(--color-bg-surface) !important;
+  padding: 0;
+}
+
+.dialog-actions {
+  background-color: var(--color-bg-surface);
+}
+
+/* ----- Switch ----- */
+.k-switch-on .k-switch-track {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.k-switch-on .k-switch-thumb {
+  background-color: var(--color-text-primary);
+}
+
+.k-switch-off .k-switch-track {
+  background-color: var(--color-bg-surface-raised);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+.k-switch-off .k-switch-thumb {
+  background-color: var(--color-text-secondary);
+}
+
+.k-switch:hover .k-switch-track {
+  border-color: transparent;
+  background-image:
+    linear-gradient(var(--color-bg-surface), var(--color-bg-surface)),
+    linear-gradient(
+      to right,
+      var(--color-accent) 0%,
+      var(--color-accent-2) 50%,
+      var(--color-accent-3) 100%
+    );
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+/* ----- Inputs (text, comboboxes, dropdowns, numeric/masked textboxes, datepicker) ----- */
+.k-input,
+.k-picker,
+.k-multiselect,
+.k-textarea {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  border-radius: var(--radius-input);
+  transition:
+    border-color 0.2s,
+    background-image 0.2s;
+}
+
+.k-input:hover,
+.k-picker:hover,
+.k-multiselect:hover,
+.k-textarea:hover {
+  border-color: transparent;
+  background-image:
+    linear-gradient(var(--color-bg-surface), var(--color-bg-surface)),
+    linear-gradient(
+      to right,
+      var(--color-accent) 0%,
+      var(--color-accent-2) 50%,
+      var(--color-accent-3) 100%
+    );
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+}
+
+.k-input:focus-within,
+.k-picker:focus-within,
+.k-multiselect:focus-within,
+.k-textarea:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.k-input-inner {
+  background-color: transparent;
+  color: var(--color-text-primary);
+}
+
+.k-input-inner::placeholder {
+  color: var(--color-text-secondary);
+}
+
+/* the little clear (x) and chevron buttons inside combobox/dropdown */
+.k-input-button {
+  background-color: transparent;
+  color: var(--color-text-secondary);
+}
+
+/* dropdown / combobox popup list (renders into a CDK overlay attached to body) */
+.k-list-item {
+  color: var(--color-text-primary);
+}
+
+.k-list-item:hover,
+.k-list-item.k-selected {
+  background-color: var(--color-accent-light);
+  color: var(--color-accent);
+}
+
+/* the floating popup container itself — without this it falls back to
+   Kendo's default white panel, which is why unselected items read as
+   faint gray-on-white instead of matching the dark theme */
+.k-popup,
+.k-list-container {
+  background-color: var(--color-bg-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.k-list {
+  background-color: transparent; /* let the popup container's background show through */
+}
+
+/* Kendo's built-in "selected" state uses its own light background by
+   default in some themes — this makes sure the currently selected
+   item (e.g. "Viewer") reads clearly against the dark popup too */
+.k-list-item.k-selected {
+  background-color: var(--color-accent-light);
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
+.k-list-item-text {
+  color: inherit; /* some Kendo versions wrap the label text in its own span */
+}
+
+/* ================= CHECKBOX ================= */
+/* kendoCheckBox renders as a native <input type="checkbox" class="k-checkbox"> */
+input.k-checkbox {
+  background-color: var(--color-bg-surface);
+  border-color: var(--color-border);
+  border-radius: 4px;
+}
+
+input.k-checkbox:hover {
+  border-color: var(--color-border-glow);
+}
+
+input.k-checkbox:checked {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+input.k-checkbox:focus-visible {
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+/* ----- Errors ----- */
+.field-error {
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+}
+
+/* ================= SEARCH — VARIANT 1: ICON OUTSIDE ================= */
+.search-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-icon-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 16px;
+  transition:
+    border-color 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
+}
+
+/* Badge lights up in sync when the adjacent input is focused */
+.search-group:focus-within .search-icon-badge {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  box-shadow: var(--glow-accent);
+}
+
+.search-input-outside.k-input {
+  border-radius: var(--radius-button);
+}
+
+.search-input-outside.k-input:focus-within {
+  border-color: var(--color-accent);
+  box-shadow:
+    0 0 0 1px var(--color-accent),
+    0 0 16px rgba(34, 211, 238, 0.25);
+}
+
+@media (max-width: 700px) {
+  .search-group {
+    width: 100%;
+  }
+  .search-input-outside {
+    width: 100% !important;
+  }
+}
+
+/* ================= PULSING GLOW (active tabs / nav) =================
+   Breathing box-shadow for anything marked .active — main nav pills and
+   form tabs. Reuses --tab-color when a component sets it (e.g. SmartForm
+   tab coloring) so the pulse matches that tab's own accent instead of
+   always defaulting to cyan. */
+@keyframes pulseGlow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px var(--tab-color, var(--color-border-glow)),
+      0 0 12px color-mix(in srgb, var(--tab-color, var(--color-accent)) 25%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 1px var(--tab-color, var(--color-border-glow)),
+      0 0 22px color-mix(in srgb, var(--tab-color, var(--color-accent)) 55%, transparent);
+  }
+}
+
+.main-nav a.active {
+  animation: pulseGlow 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .main-nav a.active {
+    animation: none;
+  }
+}
+
+/* ================= TRAVELING GLOW BORDER ================= */
+@property --border-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.glow-border-traveling {
+  position: relative;
+  border-radius: var(--radius-panel);
+  background: var(--color-bg-surface); /* the panel's own background */
+}
+
+.glow-border-traveling::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px; /* controls border thickness */
+  background: conic-gradient(
+    from var(--border-angle),
+    transparent 0%,
+    transparent 85%,
+    var(--color-accent) 92%,
+    #fff 96%,
+    var(--color-accent-2) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: travelBorder 3s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes travelBorder {
+  to {
+    --border-angle: 360deg;
+  }
+}

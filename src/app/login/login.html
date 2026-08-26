@@ -1,1 +1,85 @@
-<p>login works!</p>
+<div class="login-page">
+  <div class="login-wrapper">
+    <div class="login-card glow-border-traveling">
+      <h2 class="login-title">System Login</h2>
+      <p class="login-subtitle">Enter your credentials to continue</p>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+        <!-- Username -->
+        <div class="form-group">
+          <label for="username" class="form-label required">
+            Username
+          </label>
+
+          <input
+            id="username"
+            type="text"
+            class="form-input"
+            formControlName="username"
+            placeholder="Enter username"
+            autocomplete="username"
+          />
+
+          @if (
+            loginForm.get('username')?.invalid &&
+            loginForm.get('username')?.touched
+          ) {
+            <small class="field-error">
+              Username is required.
+            </small>
+          }
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="password" class="form-label required">
+            Password
+          </label>
+
+          <input
+            id="password"
+            type="password"
+            class="form-input"
+            formControlName="password"
+            placeholder="Enter password"
+            autocomplete="current-password"
+          />
+
+          @if (
+            loginForm.get('password')?.invalid &&
+            loginForm.get('password')?.touched
+          ) {
+            <small class="field-error">
+              Password is required.
+            </small>
+          }
+        </div>
+
+        <!-- Login button -->
+        <button
+          type="submit"
+          class="btn-login"
+          [disabled]="loading || loginForm.invalid"
+        >
+          @if (!loading) {
+            <span>Login</span>
+          } @else {
+            <span class="spinner-wrapper">
+              <span class="spinner"></span>
+              Signing in...
+            </span>
+          }
+        </button>
+
+        <!-- Login error -->
+        @if (errorMessage) {
+          <p class="field-error login-error">
+            {{ errorMessage }}
+          </p>
+        }
+
+      </form>
+    </div>
+  </div>
+</div>
