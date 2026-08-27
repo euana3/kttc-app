@@ -8,6 +8,9 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 
+//import Auth
+import { AuthService } from '../services/auth';
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -16,52 +19,73 @@ import { Router } from '@angular/router';
   styleUrl: './login.scss'
 })
 export class Login {
-
   loading = false;
-  errorMessage = '';
+  errorMessage: string = '';
 
-  loginForm: FormGroup;
+  loginForm!: FormGroup;
 
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private authService: AuthService,
+    private router: Router,
   ) {
+    this.initForm();
+  }
+
+  initForm(): void {
     this.loginForm = this.fb.group({
-      username: ['', Validators.required],
-      password: ['', Validators.required]
+      username: ['', [Validators.required]],
+      password: ['', Validators.required],
     });
   }
 
-  onSubmit(): void {
-
-    // Mark fields as touched so validation messages appear
+  // Login form submission handler
+  onSubmit() {
     if (this.loginForm.invalid) {
-      this.loginForm.markAllAsTouched();
-
       this.errorMessage = 'Please fill in all required fields.';
-
       return;
     }
 
     this.loading = true;
     this.errorMessage = '';
 
-    const username = this.loginForm.get('username')?.value;
-    const password = this.loginForm.get('password')?.value;
+    const { username, password } = this.loginForm.value;
 
-    // Temporary login logic
-    if (username === password) {
+    this.authService.loginWithUsername(username, password).subscribe({
+      next: (res) => {
+        const user = res.data.user;
+        const permission = user.permissions || [];
 
-      this.loading = false;
+        if (!permission || permission.length === 0) {
+          this.errorMessage =
+            'Your account has no permissions to login. Please contact administrator.';
+          this.loading = false;
+          return;
+        }
 
-      this.router.navigate(['/dashboard']);
+        // Store user data in session storage
+        sessionStorage.setItem('userId', user.id);
+        sessionStorage.setItem('username', user.username);
+        sessionStorage.setItem('fullname', user.fullname);
+        sessionStorage.setItem('permissions', JSON.stringify(user.permissions || []));
+        sessionStorage.setItem('usergroups', JSON.stringify(user.usergroups || []));
 
-    } else {
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err) => {
+        this.loading = false;
 
-      this.loading = false;
+        // Extract backend error message for checking the credentials
+        const backendMessage = err?.error?.error;
 
-      this.errorMessage =
-        'Username and password should be the same.';
-    }
+        // 401 = unauthorized, wrong credentials
+        if (err.status === 401) {
+          console.error(err);
+          this.errorMessage = backendMessage;
+          return;
+        }
+        this.errorMessage = backendMessage;
+      },
+    });
   }
 }
