@@ -1,1 +1,416 @@
-<p>dashboard works!</p>
+<div class="dashboard-page">
+
+  <!-- =============================== -->
+  <!-- SIDEBAR -->
+  <!-- =============================== -->
+
+  <aside class="dashboard-sidebar">
+
+    <div class="sidebar-brand">
+      <div class="brand-logo">
+        T
+      </div>
+
+      <div class="brand-text">
+        <span class="brand-title">Training</span>
+        <span class="brand-subtitle">Management System</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-navigation">
+
+      <button class="nav-item active">
+        <span class="nav-icon">⌂</span>
+        <span>Dashboard</span>
+      </button>
+
+      <button class="nav-item">
+        <span class="nav-icon">🎓</span>
+        <span>Trainees</span>
+      </button>
+
+      <button class="nav-item">
+        <span class="nav-icon">👨‍🏫</span>
+        <span>Trainers</span>
+      </button>
+
+      <button class="nav-item">
+        <span class="nav-icon">📚</span>
+        <span>Courses</span>
+      </button>
+
+      <button class="nav-item">
+        <span class="nav-icon">📅</span>
+        <span>Training</span>
+      </button>
+
+      <button class="nav-item">
+        <span class="nav-icon">📊</span>
+        <span>Reports</span>
+      </button>
+
+    </nav>
+
+    <div class="sidebar-footer">
+
+      <button class="nav-item">
+        <span class="nav-icon">⚙</span>
+        <span>Settings</span>
+      </button>
+
+      <button
+        class="nav-item logout-button"
+        (click)="logout()"
+      >
+        <span class="nav-icon">↪</span>
+        <span>Logout</span>
+      </button>
+
+    </div>
+
+  </aside>
+
+
+  <!-- =============================== -->
+  <!-- MAIN CONTENT -->
+  <!-- =============================== -->
+
+  <main class="dashboard-content">
+
+    <!-- TOP BAR -->
+
+    <header class="dashboard-header">
+
+      <div>
+        <h1>Dashboard</h1>
+
+        <p>
+          Welcome back,
+          <strong>{{ currentUser() }}</strong>
+        </p>
+      </div>
+
+      <div class="header-actions">
+
+        <button class="icon-button">
+          🔔
+          <span class="notification-badge">3</span>
+        </button>
+
+        <div class="user-profile">
+
+          <div class="user-avatar">
+            JD
+          </div>
+
+          <div class="user-info">
+            <span class="user-name">
+              {{ currentUser() }}
+            </span>
+
+            <span class="user-role">
+              {{ currentRole() }}
+            </span>
+          </div>
+
+        </div>
+
+      </div>
+
+    </header>
+
+
+    <!-- =============================== -->
+    <!-- SUMMARY -->
+    <!-- =============================== -->
+
+    <section class="dashboard-summary">
+
+      <div class="summary-card">
+        <span class="summary-icon blue">🎓</span>
+
+        <div>
+          <span class="summary-label">Active Courses</span>
+          <strong>12</strong>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <span class="summary-icon green">✓</span>
+
+        <div>
+          <span class="summary-label">Completed</span>
+          <strong>8</strong>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <span class="summary-icon orange">◷</span>
+
+        <div>
+          <span class="summary-label">Upcoming</span>
+          <strong>4</strong>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <span class="summary-icon purple">★</span>
+
+        <div>
+          <span class="summary-label">Overall Progress</span>
+          <strong>72%</strong>
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- =============================== -->
+    <!-- MAIN FEATURES -->
+    <!-- =============================== -->
+
+    <section class="section-header">
+
+      <div>
+        <h2>Training Management</h2>
+
+        <p>
+          Access your training tools and insights.
+        </p>
+      </div>
+
+    </section>
+
+
+    <section class="feature-grid">
+
+      @for (card of dashboardCards(); track card.title) {
+
+        @if (card.enabled) {
+
+          <article
+            class="feature-card"
+            [class]="card.color"
+            (click)="navigateTo(card.route)"
+          >
+
+            <div class="feature-icon">
+              {{ card.icon }}
+            </div>
+
+            <div class="feature-content">
+
+              <h3>
+                {{ card.title }}
+              </h3>
+
+              <p>
+                {{ card.description }}
+              </p>
+
+            </div>
+
+            <span class="feature-arrow">
+              →
+            </span>
+
+          </article>
+
+        }
+
+      }
+
+    </section>
+
+
+    <!-- =============================== -->
+    <!-- COPILOT -->
+    <!-- =============================== -->
+
+    <section class="copilot-card">
+
+      <div class="copilot-icon">
+        🤖
+      </div>
+
+      <div class="copilot-content">
+
+        <span class="copilot-label">
+          AI TRAINING COPILOT
+        </span>
+
+        <h2>
+          What would you like to know?
+        </h2>
+
+        <p>
+          Ask questions about courses, trainees, training schedules,
+          performance or reports using natural language.
+        </p>
+
+        <div class="copilot-input">
+
+          <input
+            type="text"
+            placeholder="Ask something like: Which trainees are behind schedule?"
+          />
+
+          <button>
+            Ask Copilot
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- =============================== -->
+    <!-- LOWER SECTION -->
+    <!-- =============================== -->
+
+    <section class="dashboard-columns">
+
+      <!-- ALERTS -->
+
+      <div class="dashboard-panel">
+
+        <div class="panel-header">
+
+          <div>
+            <h3>Alerts</h3>
+            <span>Requires your attention</span>
+          </div>
+
+          <button class="view-all">
+            View all
+          </button>
+
+        </div>
+
+        <div class="alert-list">
+
+          <div class="alert-item warning">
+
+            <span class="alert-icon">
+              ⚠
+            </span>
+
+            <div>
+              <strong>
+                Course deadline approaching
+              </strong>
+
+              <p>
+                3 trainees have courses due this week.
+              </p>
+            </div>
+
+          </div>
+
+          <div class="alert-item danger">
+
+            <span class="alert-icon">
+              !
+            </span>
+
+            <div>
+              <strong>
+                Assessment results pending
+              </strong>
+
+              <p>
+                5 assessments require review.
+              </p>
+            </div>
+
+          </div>
+
+          <div class="alert-item info">
+
+            <span class="alert-icon">
+              i
+            </span>
+
+            <div>
+              <strong>
+                New training material
+              </strong>
+
+              <p>
+                New course material is available.
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- RECOMMENDATIONS -->
+
+      <div class="dashboard-panel">
+
+        <div class="panel-header">
+
+          <div>
+            <h3>Recommendations</h3>
+            <span>Based on your activity</span>
+          </div>
+
+          <button class="view-all">
+            View all
+          </button>
+
+        </div>
+
+        <div class="recommendation-list">
+
+          <div class="recommendation-item">
+
+            <div class="recommendation-icon">
+              💡
+            </div>
+
+            <div>
+              <strong>
+                Advanced Leadership
+              </strong>
+
+              <p>
+                Recommended based on your completed courses.
+              </p>
+            </div>
+
+          </div>
+
+          <div class="recommendation-item">
+
+            <div class="recommendation-icon">
+              📚
+            </div>
+
+            <div>
+              <strong>
+                Data Analysis Fundamentals
+              </strong>
+
+              <p>
+                Improve your reporting and analytical skills.
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>

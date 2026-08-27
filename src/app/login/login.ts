@@ -8,7 +8,7 @@ import {
 } from '@angular/forms';
 import { Router } from '@angular/router';
 
-//import Auth
+// Import Auth
 import { AuthService } from '../services/auth';
 
 @Component({
@@ -56,12 +56,12 @@ export class Login {
         const user = res.data.user;
         const permission = user.permissions || [];
 
-        if (!permission || permission.length === 0) {
-          this.errorMessage =
-            'Your account has no permissions to login. Please contact administrator.';
-          this.loading = false;
-          return;
-        }
+        // if (!permission || permission.length === 0) {
+        //   this.errorMessage =
+        //     'Your account has no permissions to login. Please contact administrator.';
+        //   this.loading = false;
+        //   return;
+        // }
 
         // Store user data in session storage
         sessionStorage.setItem('userId', user.id);
