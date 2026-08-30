@@ -60,9 +60,9 @@
         <button
           type="submit"
           class="btn-login"
-          [disabled]="loading || loginForm.invalid"
+          [disabled]="loading() || loginForm.invalid"
         >
-          @if (!loading) {
+          @if (!loading()) {
             <span>Login</span>
           } @else {
             <span class="spinner-wrapper">
@@ -72,10 +72,9 @@
           }
         </button>
 
-        <!-- Login error -->
-        @if (errorMessage) {
+        @if (errorMessage()) {
           <p class="field-error login-error">
-            {{ errorMessage }}
+            {{ errorMessage() }}
           </p>
         }
 
