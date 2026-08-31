@@ -20,32 +20,32 @@
     <nav class="sidebar-navigation">
 
       <button class="nav-item active">
-        <span class="nav-icon">⌂</span>
+        <svg [lucideIcon]="houseIcon" [size]="20" class="nav-icon"></svg>
         <span>Dashboard</span>
       </button>
 
       <button class="nav-item">
-        <span class="nav-icon">🎓</span>
+        <svg [lucideIcon]="graduationCapIcon" [size]="20" class="nav-icon"></svg>
         <span>Trainees</span>
       </button>
 
       <button class="nav-item">
-        <span class="nav-icon">👨‍🏫</span>
+        <svg [lucideIcon]="usersIcon" [size]="20" class="nav-icon"></svg>
         <span>Trainers</span>
       </button>
 
       <button class="nav-item">
-        <span class="nav-icon">📚</span>
+        <svg [lucideIcon]="bookOpenIcon" [size]="20" class="nav-icon"></svg>
         <span>Courses</span>
       </button>
 
       <button class="nav-item">
-        <span class="nav-icon">📅</span>
+        <svg [lucideIcon]="calendarIcon" [size]="20" class="nav-icon"></svg>
         <span>Training</span>
       </button>
 
       <button class="nav-item">
-        <span class="nav-icon">📊</span>
+        <svg [lucideIcon]="chartBarIcon" [size]="20" class="nav-icon"></svg>
         <span>Reports</span>
       </button>
 
@@ -54,7 +54,7 @@
     <div class="sidebar-footer">
 
       <button class="nav-item">
-        <span class="nav-icon">⚙</span>
+        <svg [lucideIcon]="settingsIcon" [size]="20" class="nav-icon"></svg>
         <span>Settings</span>
       </button>
 
@@ -62,7 +62,7 @@
         class="nav-item logout-button"
         (click)="logout()"
       >
-        <span class="nav-icon">↪</span>
+        <svg [lucideIcon]="logoutIcon" [size]="20" class="nav-icon"></svg>
         <span>Logout</span>
       </button>
 
@@ -93,7 +93,7 @@
       <div class="header-actions">
 
         <button class="icon-button">
-          🔔
+          <svg [lucideIcon]="bellIcon" [size]="20"></svg>
           <span class="notification-badge">3</span>
         </button>
 
@@ -127,7 +127,9 @@
     <section class="dashboard-summary">
 
       <div class="summary-card">
-        <span class="summary-icon blue">🎓</span>
+        <span class="summary-icon blue">
+          <svg [lucideIcon]="graduationCapIcon" [size]="20"></svg>
+        </span>
 
         <div>
           <span class="summary-label">Active Courses</span>
@@ -136,7 +138,9 @@
       </div>
 
       <div class="summary-card">
-        <span class="summary-icon green">✓</span>
+        <span class="summary-icon green">
+          <svg [lucideIcon]="checkIcon" [size]="20"></svg>
+        </span>
 
         <div>
           <span class="summary-label">Completed</span>
@@ -145,7 +149,9 @@
       </div>
 
       <div class="summary-card">
-        <span class="summary-icon orange">◷</span>
+        <span class="summary-icon orange">
+          <svg [lucideIcon]="calendarIcon" [size]="20"></svg>
+        </span>
 
         <div>
           <span class="summary-label">Upcoming</span>
@@ -154,7 +160,9 @@
       </div>
 
       <div class="summary-card">
-        <span class="summary-icon purple">★</span>
+        <span class="summary-icon purple">
+          <svg [lucideIcon]="chartBarIcon" [size]="20"></svg>
+        </span>
 
         <div>
           <span class="summary-label">Overall Progress</span>
@@ -195,7 +203,7 @@
           >
 
             <div class="feature-icon">
-              {{ card.icon }}
+              <svg [lucideIcon]="card.icon" [size]="28"></svg>
             </div>
 
             <div class="feature-content">
@@ -230,7 +238,7 @@
     <section class="copilot-card">
 
       <div class="copilot-icon">
-        🤖
+        <svg [lucideIcon]="botIcon" [size]="24"></svg>
       </div>
 
       <div class="copilot-content">
@@ -294,7 +302,7 @@
           <div class="alert-item warning">
 
             <span class="alert-icon">
-              ⚠
+              <svg [lucideIcon]="triangleAlertIcon" [size]="18"></svg>
             </span>
 
             <div>
@@ -312,7 +320,7 @@
           <div class="alert-item danger">
 
             <span class="alert-icon">
-              !
+              <svg [lucideIcon]="circleAlertIcon" [size]="18"></svg>
             </span>
 
             <div>
@@ -330,7 +338,7 @@
           <div class="alert-item info">
 
             <span class="alert-icon">
-              i
+              <svg [lucideIcon]="infoIcon" [size]="18"></svg>
             </span>
 
             <div>
@@ -372,7 +380,7 @@
           <div class="recommendation-item">
 
             <div class="recommendation-icon">
-              💡
+              <svg [lucideIcon]="lightbulbIcon" [size]="18"></svg>
             </div>
 
             <div>
@@ -390,7 +398,7 @@
           <div class="recommendation-item">
 
             <div class="recommendation-icon">
-              📚
+              <svg [lucideIcon]="bookOpenIcon" [size]="18"></svg>
             </div>
 
             <div>
