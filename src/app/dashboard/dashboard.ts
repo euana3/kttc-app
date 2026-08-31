@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 
 interface DashboardCard {
@@ -10,19 +10,20 @@ interface DashboardCard {
   enabled: boolean;
 }
 
+// type UserRole = 'Trainee' | 'Trainer' | 'Training Manager' | 'Admin';
+type UserRole = 'Trainee' | 'Trainer' | 'Training Manager' | 'Admin';
+
 @Component({
   selector: 'app-dashboard',
   imports: [],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
-export class Dashboard {
+export class Dashboard implements OnInit {
 
-  protected readonly currentUser = signal('John Doe');
+ protected readonly currentUser = signal('');
+  protected readonly currentRole = signal<UserRole>('Trainee');
 
-  protected readonly currentRole = signal<
-    'Trainee' | 'Trainer' | 'Training Manager' | 'Admin'
-  >('Trainee');
 
   protected readonly dashboardCards = signal<DashboardCard[]>([
     {
@@ -84,6 +85,28 @@ export class Dashboard {
   ]);
 
   constructor(private router: Router) {}
+
+   ngOnInit(): void {
+    this.loadUserFromSession();
+  }
+
+   private loadUserFromSession(): void {
+    const fullname = sessionStorage.getItem('fullname');
+    const username = sessionStorage.getItem('username');
+    this.currentUser.set(fullname || username || 'Guest');
+
+    const usergroups: string[] = JSON.parse(sessionStorage.getItem('usergroups') || '[]');
+    this.currentRole.set(this.resolveRole(usergroups));
+  }
+
+  private resolveRole(usergroups: string[]): UserRole {
+    const groups = usergroups.map(g => g.toLowerCase());
+
+    if (groups.includes('admin')) return 'Admin';
+    if (groups.includes('training manager') || groups.includes('trainingmanager')) return 'Training Manager';
+    if (groups.includes('trainer')) return 'Trainer';
+    return 'Trainee';
+  }
 
   protected navigateTo(route?: string): void {
     if (!route) {
