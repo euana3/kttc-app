@@ -1,0 +1,30 @@
+<div class="settings-page">
+
+  <header class="settings-header">
+  <button class="back-button" (click)="goBack()">
+    <svg [lucideIcon]="arrowLeftIcon" [size]="16"></svg>
+    <span>Back to Dashboard</span>
+  </button>
+
+  <h1>Settings</h1>
+  <p>Manage your account, security and system preferences.</p>
+</header>
+
+  <div class="settings-layout">
+
+    <nav class="settings-nav">
+      @for (item of navItems; track item.route) {
+        <a [routerLink]="item.route" routerLinkActive="active" class="settings-nav-item">
+          <svg [lucideIcon]="item.icon" [size]="18"></svg>
+          <span>{{ item.label }}</span>
+        </a>
+      }
+    </nav>
+
+    <div class="settings-content">
+      <router-outlet></router-outlet>
+    </div>
+
+  </div>
+
+</div>

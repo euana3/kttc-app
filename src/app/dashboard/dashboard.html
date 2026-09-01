@@ -7,9 +7,6 @@
   <aside class="dashboard-sidebar">
 
     <div class="sidebar-brand">
-      <div class="brand-logo">
-        T
-      </div>
 
       <div class="brand-text">
         <span class="brand-title">Training</span>
@@ -53,7 +50,7 @@
 
     <div class="sidebar-footer">
 
-      <button class="nav-item">
+      <button class="nav-item" (click)="navigateTo('/settings')">
         <svg [lucideIcon]="settingsIcon" [size]="20" class="nav-icon"></svg>
         <span>Settings</span>
       </button>

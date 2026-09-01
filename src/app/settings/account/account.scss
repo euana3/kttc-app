@@ -1,0 +1,7 @@
+@use '../settings-shared';
+
+.profile-field {
+  margin-bottom: 14px;
+  label { display: block; font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-bottom: 2px; }
+  p { margin: 0; color: var(--color-text-primary); font-size: var(--font-size-md); }
+}
