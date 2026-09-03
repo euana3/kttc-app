@@ -2,7 +2,6 @@
 
   <header class="page-header">
     <h1>Create Module</h1>
-    <p>{{ today() | date:'EEEE, d MMMM y' }}</p>
   </header>
 
   <form class="module-form" [formGroup]="form" (ngSubmit)="onSubmit()">
@@ -47,9 +46,15 @@
       <p class="form-error">{{ errorMessage() }}</p>
     }
 
-    <button type="submit" class="btn-submit" [disabled]="submitting()">
-      {{ submitting() ? 'Creating...' : 'Create Module' }}
-    </button>
+    <div class="form-actions">
+  <button type="button" class="btn-cancel" (click)="onCancel()" [disabled]="submitting()">
+    Cancel
+  </button>
+
+  <button type="submit" class="btn-submit" [disabled]="submitting()">
+    {{ submitting() ? 'Creating...' : 'Create Course' }}
+  </button>
+</div>
 
   </form>
 

@@ -41,6 +41,10 @@ export class CreateModule implements OnInit {
     });
   }
 
+  protected onCancel(): void {
+    this.router.navigate(['/dashboard/courses']);
+  }
+
   protected togglePrerequisite(moduleId: number): void {
     this.selectedPrerequisiteIds.update(ids =>
       ids.includes(moduleId) ? ids.filter(id => id !== moduleId) : [...ids, moduleId]

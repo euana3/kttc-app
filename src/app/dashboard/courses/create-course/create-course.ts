@@ -50,6 +50,10 @@ export class CreateCourse implements OnInit {
     });
   }
 
+  protected onCancel(): void {
+    this.router.navigate(['/dashboard/courses']);
+  }
+
   protected togglePrerequisiteCourse(courseId: number): void {
     this.selectedPrerequisiteCourseIds.update(ids =>
       ids.includes(courseId) ? ids.filter(id => id !== courseId) : [...ids, courseId]
