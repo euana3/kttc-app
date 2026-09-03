@@ -98,6 +98,9 @@
 html,
 body {
   height: 100%;
+  margin: 0;
+  background: #080d18;
+  overscroll-behavior: none;
 }
 
 body {

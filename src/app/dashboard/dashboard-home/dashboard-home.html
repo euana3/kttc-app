@@ -1,0 +1,165 @@
+<section class="dashboard-summary">
+
+  <div class="summary-card">
+    <span class="summary-icon blue">
+      <svg [lucideIcon]="graduationCapIcon" [size]="20"></svg>
+    </span>
+    <div>
+      <span class="summary-label">Active Courses</span>
+      <strong>12</strong>
+    </div>
+  </div>
+
+  <div class="summary-card">
+    <span class="summary-icon green">
+      <svg [lucideIcon]="checkIcon" [size]="20"></svg>
+    </span>
+    <div>
+      <span class="summary-label">Completed</span>
+      <strong>8</strong>
+    </div>
+  </div>
+
+  <div class="summary-card">
+    <span class="summary-icon orange">
+      <svg [lucideIcon]="calendarIcon" [size]="20"></svg>
+    </span>
+    <div>
+      <span class="summary-label">Upcoming</span>
+      <strong>4</strong>
+    </div>
+  </div>
+
+  <div class="summary-card">
+    <span class="summary-icon purple">
+      <svg [lucideIcon]="chartBarIcon" [size]="20"></svg>
+    </span>
+    <div>
+      <span class="summary-label">Overall Progress</span>
+      <strong>72%</strong>
+    </div>
+  </div>
+
+</section>
+
+
+<section class="section-header">
+  <div>
+    <h2>Training Management</h2>
+    <p>Access your training tools and insights.</p>
+  </div>
+</section>
+
+<section class="feature-grid">
+  @for (card of dashboardCards(); track card.title) {
+    @if (card.enabled) {
+      <article class="feature-card" [class]="card.color" (click)="navigateTo(card.route)">
+        <div class="feature-icon">
+          <svg [lucideIcon]="card.icon" [size]="28"></svg>
+        </div>
+        <div class="feature-content">
+          <h3>{{ card.title }}</h3>
+          <p>{{ card.description }}</p>
+        </div>
+        <span class="feature-arrow">→</span>
+      </article>
+    }
+  }
+</section>
+
+
+<section class="copilot-card">
+  <div class="copilot-icon">
+    <svg [lucideIcon]="botIcon" [size]="24"></svg>
+  </div>
+
+  <div class="copilot-content">
+    <span class="copilot-label">AI TRAINING COPILOT</span>
+    <h2>What would you like to know?</h2>
+    <p>Ask questions about courses, trainees, training schedules, performance or reports using natural language.</p>
+
+    <div class="copilot-input">
+      <input type="text" placeholder="Ask something like: Which trainees are behind schedule?" />
+      <button>Ask Copilot</button>
+    </div>
+  </div>
+</section>
+
+
+<section class="dashboard-columns">
+
+  <div class="dashboard-panel">
+    <div class="panel-header">
+      <div>
+        <h3>Alerts</h3>
+        <span>Requires your attention</span>
+      </div>
+      <button class="view-all">View all</button>
+    </div>
+
+    <div class="alert-list">
+      <div class="alert-item warning">
+        <span class="alert-icon">
+          <svg [lucideIcon]="triangleAlertIcon" [size]="18"></svg>
+        </span>
+        <div>
+          <strong>Course deadline approaching</strong>
+          <p>3 trainees have courses due this week.</p>
+        </div>
+      </div>
+
+      <div class="alert-item danger">
+        <span class="alert-icon">
+          <svg [lucideIcon]="circleAlertIcon" [size]="18"></svg>
+        </span>
+        <div>
+          <strong>Assessment results pending</strong>
+          <p>5 assessments require review.</p>
+        </div>
+      </div>
+
+      <div class="alert-item info">
+        <span class="alert-icon">
+          <svg [lucideIcon]="infoIcon" [size]="18"></svg>
+        </span>
+        <div>
+          <strong>New training material</strong>
+          <p>New course material is available.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-panel">
+    <div class="panel-header">
+      <div>
+        <h3>Recommendations</h3>
+        <span>Based on your activity</span>
+      </div>
+      <button class="view-all">View all</button>
+    </div>
+
+    <div class="recommendation-list">
+      <div class="recommendation-item">
+        <div class="recommendation-icon">
+          <svg [lucideIcon]="lightbulbIcon" [size]="18"></svg>
+        </div>
+        <div>
+          <strong>Advanced Leadership</strong>
+          <p>Recommended based on your completed courses.</p>
+        </div>
+      </div>
+
+      <div class="recommendation-item">
+        <div class="recommendation-icon">
+          <svg [lucideIcon]="bookOpenIcon" [size]="18"></svg>
+        </div>
+        <div>
+          <strong>Data Analysis Fundamentals</strong>
+          <p>Improve your reporting and analytical skills.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>

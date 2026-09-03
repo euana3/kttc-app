@@ -1,0 +1,72 @@
+<div class="create-course-page">
+
+  <header class="page-header">
+    <h1>Create Course</h1>
+    <p>{{ today() | date:'EEEE, d MMMM y' }}</p>
+  </header>
+
+  <form class="course-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+
+    <div class="form-group">
+      <label>Course Name</label>
+      <input type="text" formControlName="name" placeholder="e.g. Course 5" />
+    </div>
+
+    <div class="form-group">
+      <label>Description</label>
+      <textarea formControlName="description" rows="4" placeholder="What this course covers"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Modules Included</label>
+      <div class="pill-group">
+        @for (module of availableModules(); track module.id) {
+          <button
+            type="button"
+            class="pill"
+            [class.selected]="isModuleSelected(module.id)"
+            (click)="toggleModule(module.id)"
+          >
+            {{ module.name }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Pre-Requisite Courses</label>
+      <div class="pill-group">
+        @for (course of availableCourses(); track course.id) {
+          <button
+            type="button"
+            class="pill"
+            [class.selected]="isCourseSelected(course.id)"
+            (click)="togglePrerequisiteCourse(course.id)"
+          >
+            {{ course.name }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Skills Learnt</label>
+      <input type="text" formControlName="skills_learnt" placeholder="e.g. Defensive driving" />
+    </div>
+
+    <div class="form-group">
+      <label>Estimated Time Taken</label>
+      <input type="text" formControlName="estimated_time" placeholder="e.g. 4 weeks" />
+    </div>
+
+    @if (errorMessage()) {
+      <p class="form-error">{{ errorMessage() }}</p>
+    }
+
+    <button type="submit" class="btn-submit" [disabled]="submitting()">
+      {{ submitting() ? 'Creating...' : 'Create Course' }}
+    </button>
+
+  </form>
+
+</div>

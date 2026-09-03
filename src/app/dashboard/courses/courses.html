@@ -1,0 +1,43 @@
+<div class="courses-page">
+
+  <header class="courses-header">
+    <div>
+      <h1>Courses</h1>
+      <p>Manage your course catalog and modules.</p>
+    </div>
+
+    <div class="courses-actions">
+      <button class="btn-outline" (click)="goToNewModule()">+ New module</button>
+      <button class="btn-solid" (click)="goToNewCourse()">+ New course</button>
+    </div>
+  </header>
+
+  <section class="course-list">
+
+    @if (loading()) {
+      <p class="empty-text">Loading courses...</p>
+    } @else if (courses().length === 0) {
+      <p class="empty-text">No courses yet. Create your first one to get started.</p>
+    } @else {
+      @for (course of courses(); track course.id) {
+        <div class="course-card">
+          <div class="course-main">
+            <h3>{{ course.name }}</h3>
+            <p>{{ course.description }}</p>
+          </div>
+
+          <div class="course-meta">
+            @if (course.estimated_time) {
+              <span class="meta-pill">{{ course.estimated_time }}</span>
+            }
+            @if (course.skills_learnt) {
+              <span class="meta-pill">{{ course.skills_learnt }}</span>
+            }
+          </div>
+        </div>
+      }
+    }
+
+  </section>
+
+</div>
