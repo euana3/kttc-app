@@ -25,10 +25,14 @@
         <span>Dashboard</span>
       </a>
 
-      <button class="nav-item">
+      <a 
+        routerLink="/dashboard/trainees" 
+        routerLinkActive="active" 
+        class="nav-item"
+      >
         <svg [lucideIcon]="graduationCapIcon" [size]="20" class="nav-icon"></svg>
         <span>Trainees</span>
-      </button>
+      </a>
 
       <button class="nav-item">
         <svg [lucideIcon]="usersIcon" [size]="20" class="nav-icon"></svg>

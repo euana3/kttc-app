@@ -13,6 +13,10 @@ import { Security } from './settings/security/security';
 import { UserManagement } from './settings/user-management/user-management';
 import { DangerZone } from './settings/danger-zone/danger-zone';
 
+import { Trainees } from './dashboard/trainees/trainees';
+import { BatchDetail } from './dashboard/trainees/batch-detail/batch-detail';
+import { TraineeDetail } from './dashboard/trainees/trainee-detail/trainee-detail';
+import { AttemptDetail } from './dashboard/trainees/attempt-detail/attempt-detail';
 
 export const routes: Routes = [
   { path: 'login', component: Login },
@@ -26,6 +30,12 @@ export const routes: Routes = [
       { path: 'courses', component: Courses },
       { path: 'courses/new', component: CreateCourse },
       { path: 'modules/new', component: CreateModule },
+
+      { path: 'trainees', component: Trainees },
+      { path: 'trainees/batches/:batchId', component: BatchDetail },
+      { path: 'trainees/batches/:batchId/trainee/:traineeId', component: TraineeDetail },
+      { path: 'trainees/attempts/:attemptId', component: AttemptDetail },
+
     ],
   },
 

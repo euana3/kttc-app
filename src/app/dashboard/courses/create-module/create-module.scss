@@ -126,17 +126,22 @@
   gap: 10px;
 }
 
-.btn-cancel {
+.btn-cancel,
+.btn-submit {
   flex: 1;
-  height: 44px;
+  height: 40px;
+  padding: 0 18px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-cancel {
   background: transparent;
   color: #8b98b8;
   border: 1px solid rgba(139, 152, 184, 0.2);
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .btn-cancel:hover:not(:disabled) {
@@ -147,5 +152,22 @@
 
 .btn-cancel:disabled {
   opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-submit {
+  background: #4dabf7;
+  color: #051016;
+  border: none;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background: #74c0fc;
+  box-shadow: 0 0 16px rgba(77, 171, 247, 0.3);
+}
+
+.btn-submit:disabled {
+  background: rgba(139, 152, 184, 0.2);
+  color: #8b98b8;
   cursor: not-allowed;
 }

@@ -1,0 +1,94 @@
+<div class="attempt-detail-page">
+
+  @if (attempt(); as a) {
+    <header class="page-header">
+      <h1>{{ a.module_name }}</h1>
+    </header>
+
+    <div class="detail-columns">
+
+      <div class="left-column">
+        <div class="indicators-panel">
+          <div class="panel-top">
+            <span class="panel-label">PERFORMANCE INDICATORS AND LEVELS</span>
+            <div class="score-block">
+              <span class="score-label">PERFORMANCE SCORE</span>
+              <strong class="score-value">{{ a.score ?? totalScore(a.indicator_scores) }}%</strong>
+            </div>
+          </div>
+
+          <table class="indicators-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>PERFORMANCE INDICATORS</th>
+                <th>MEASUREMENT</th>
+                <th>WEIGHT (%)</th>
+                <th>SCORE</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (ind of a.indicator_scores; track ind.indicator_id; let i = $index) {
+                <tr>
+                  <td>{{ i + 1 }}</td>
+                  <td>{{ ind.name }}</td>
+                  <td>{{ ind.measurement }}</td>
+                  <td>{{ ind.weight }}</td>
+                  <td>{{ ind.score }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+
+          @if (a.report) {
+            <div class="report-block">
+              <h3>Performance Report</h3>
+              <p>{{ a.report.content }}</p>
+
+              <ol class="suggestion-list">
+                @for (line of suggestionLines(a.report.suggestions); track line) {
+                  <li>{{ line }}</li>
+                }
+              </ol>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="right-column">
+        <div class="past-attempts-panel">
+          <span class="panel-label">PAST ATTEMPTS</span>
+
+          @if (a.past_attempts.length === 0) {
+            <p class="empty-text">No previous attempts.</p>
+          } @else {
+            @for (past of a.past_attempts; track past.id) {
+              <div class="past-attempt-row">
+                <span>Attempt {{ past.attempt_number }}</span>
+                <span>{{ past.score ?? '—' }}%</span>
+              </div>
+            }
+          }
+        </div>
+
+        @if (a.report) {
+          <div class="ai-panel">
+            <span class="panel-label">EVIDENCE AT A GLANCE / AI EXPLANATION & RECOMMENDED ENRICHMENT</span>
+            <ol class="suggestion-list">
+              @for (line of suggestionLines(a.report.suggestions); track line) {
+                <li>{{ line }}</li>
+              }
+            </ol>
+          </div>
+        }
+      </div>
+
+    </div>
+
+  } @else if (loading()) {
+    <p class="empty-text">Loading attempt details...</p>
+  } @else {
+    <p class="empty-text">Attempt not found.</p>
+  }
+
+</div>

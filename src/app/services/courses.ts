@@ -36,8 +36,7 @@ export interface CreateCoursePayload {
 })
 export class CoursesService {
 
-  private readonly baseUrl = `${environment.apiUrl}/courses`;
-
+private readonly baseUrl = `${environment.apiUrl}/courses`; // or /modules, /batches, /trainees, /attempts, /analytics, /chat
   constructor(private http: HttpClient) {}
 
   // GET / — all courses, plus every batch (Courses management page)

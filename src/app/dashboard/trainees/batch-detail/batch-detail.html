@@ -1,0 +1,49 @@
+<div class="batch-detail-page">
+
+  @if (batch(); as b) {
+    <header class="page-header">
+      <h1>{{ b.name }}</h1>
+    </header>
+
+    <section class="modules-section">
+      <h2>Modules</h2>
+
+      <div class="module-grid">
+        @for (module of b.module_progress; track module.module_id) {
+          <div class="module-card">
+            <span class="module-label">{{ module.module_name }}</span>
+            <div class="progress-track">
+              <div class="progress-fill" [style.width.%]="module.average_progress_percent"></div>
+            </div>
+            <p class="progress-text">{{ module.average_progress_percent }}% average progress</p>
+          </div>
+        }
+      </div>
+    </section>
+
+    <section class="trainees-section">
+      <h2>Trainees</h2>
+
+      <div class="trainee-list">
+        @for (t of b.trainee_progress; track t.trainee.id) {
+          <div class="trainee-row" (click)="openTrainee(t.trainee.id)">
+            <div class="trainee-avatar">{{ t.trainee.name.slice(0, 2).toUpperCase() }}</div>
+            <span class="trainee-name">{{ t.trainee.name }}</span>
+
+            <div class="progress-track wide">
+              <div class="progress-fill dark" [style.width.%]="t.progress_percent"></div>
+            </div>
+
+            <span class="status-dot" [class]="statusClass(t.status)"></span>
+          </div>
+        }
+      </div>
+    </section>
+
+  } @else if (loading()) {
+    <p class="empty-text">Loading batch details...</p>
+  } @else {
+    <p class="empty-text">Batch not found.</p>
+  }
+
+</div>

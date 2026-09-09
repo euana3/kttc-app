@@ -1,0 +1,156 @@
+.batch-detail-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.page-header h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.page-header p {
+  margin: 0;
+  color: #8b98b8;
+  font-size: 13px;
+}
+
+.empty-text {
+  padding: 20px;
+  text-align: center;
+  color: #8b98b8;
+  font-size: 13px;
+}
+
+h2 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.module-card {
+  padding: 18px;
+  background: rgba(17, 27, 46, 0.72);
+  border: 1px solid rgba(139, 152, 184, 0.12);
+  border-radius: 10px;
+}
+
+.module-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #74c0fc;
+  margin-bottom: 10px;
+}
+
+.progress-track {
+  height: 6px;
+  background: rgba(139, 152, 184, 0.15);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-track.wide {
+  flex: 1;
+  height: 6px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #2f9e6e;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.progress-fill.dark {
+  background: #1c2333;
+}
+
+.progress-text {
+  margin: 8px 0 0;
+  font-size: 11px;
+  color: #8b98b8;
+}
+
+.trainee-list {
+  display: flex;
+  flex-direction: column;
+  background: rgba(17, 27, 46, 0.72);
+  border: 1px solid rgba(139, 152, 184, 0.12);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.trainee-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(139, 152, 184, 0.08);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.trainee-row:last-child {
+  border-bottom: none;
+}
+
+.trainee-row:hover {
+  background: rgba(77, 171, 247, 0.06);
+}
+
+.trainee-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(139, 152, 184, 0.15);
+  color: #8b98b8;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.trainee-name {
+  width: 100px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #e6edf7;
+  flex-shrink: 0;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-dot.live {
+  background: #2f9e6e;
+  box-shadow: 0 0 8px rgba(47, 158, 110, 0.6);
+}
+
+.status-dot.attention {
+  background: #ff6b81;
+}
+
+.status-dot.ok {
+  background: #8b98b8;
+}
+
+@media (max-width: 1200px) {
+  .module-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

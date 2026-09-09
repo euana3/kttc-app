@@ -1,12 +1,55 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
 import { environment } from '../environment/environment';
 
-// Matches the Postgres enum exactly
+export interface IndicatorScore {
+  indicator_id: number;
+  name: string;
+  measurement: string;
+  weight: number;
+  score: number | null;
+}
+
+export interface PastAttempt {
+  id: number;
+  attempt_number: number;
+  score: number | null;
+}
+
+export interface AttemptReport {
+  content: string;
+  suggestions: string | null;
+}
+
+export type Report = AttemptReport;
+
 export type AttemptStatus = 'to_do' | 'in_progress' | 'completed' | 'failed';
 
-export interface ModuleAttempt {
+export interface AttemptDetail {
+  id: number;
+  module_id: number;
+  module_name: string;
+  trainee_id: number;
+  trainee_name: string;
+  batch_id: number;
+  attempt_number: number;
+  max_attempts: number;
+  status: AttemptStatus;
+  score: number | null;
+  avg_time_per_session: string | null;
+  is_live: boolean;
+  indicator_scores: IndicatorScore[];
+  past_attempts: PastAttempt[];
+  report: AttemptReport | null;
+}
+
+// Shape as actually returned by GET /api/attempts/:id.
+// NOTE: performance_indicators was only observed empty (attempt 25, in_progress).
+// The inner item shape below (indicator_id/name/measurement/weight/score) is inferred
+// from the backend guide's schema description, not yet confirmed against a populated
+// example — check GET /api/attempts/1 (completed, 3rd attempt) to verify.
+interface RawAttemptDetail {
   id: number;
   trainee_id: number;
   module_id: number;
@@ -14,101 +57,79 @@ export interface ModuleAttempt {
   attempt_number: number;
   max_attempts: number;
   status: AttemptStatus;
-  score: number | null;
+  score: string | null;
   avg_time_per_session: string | null;
-  started_at: string | null;
+  started_at: string;
   completed_at: string | null;
   is_live: boolean;
   created_at: string;
+  trainee_name: string;
+  module_name: string;
+  performance_indicators: {
+    indicator_id: number;
+    name: string;
+    measurement: string;
+    weight: string | number;
+    score: string | null;
+  }[];
+  past_attempts: { id: number; attempt_number: number; score: string | null }[];
+  report: AttemptReport | null;
 }
 
-export interface IndicatorScore {
-  indicator_id: number;
-  name: string;
-  measurement: string | null;
-  weight: number | null;
-  score: number | null;
-}
-
-export interface Report {
-  id: number;
-  entity_type: 'module' | 'cohort' | 'trainee_module';
-  entity_id: number;
-  batch_id: number | null;
-  content: string | null;
-  suggestions: string | null;
-  generated_at: string;
-}
-
-// GET /:id shape
-export interface AttemptDetail extends ModuleAttempt {
-  indicator_scores: IndicatorScore[];
-  past_attempts: ModuleAttempt[]; // same trainee, same module, earlier attempts
-  report: Report | null;
-}
-
-export interface AttemptEvent {
-  id: number;
-  attempt_id: number;
-  event_type: string;
-  description: string;
-  is_error: boolean;
-  created_at: string;
-}
-
-export interface CreateAttemptPayload {
-  trainee_id: number;
-  module_id: number;
-  batch_id: number;
-}
-
-export interface UpdateAttemptPayload {
-  status?: AttemptStatus;
-  score?: number;
-  is_live?: boolean;
-}
-
-export interface CreateAttemptEventPayload {
-  event_type: string;
-  description: string;
-  is_error?: boolean;
-}
-
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class AttemptsService {
-
   private readonly baseUrl = `${environment.apiUrl}/attempts`;
 
   constructor(private http: HttpClient) {}
 
-  // GET /:id — full attempt detail
   getById(id: number): Observable<AttemptDetail> {
-    return this.http.get<AttemptDetail>(`${this.baseUrl}/${id}`);
+    return this.http.get<RawAttemptDetail>(`${this.baseUrl}/${id}`).pipe(
+      map(raw => ({
+        id: raw.id,
+        module_id: raw.module_id,
+        module_name: raw.module_name,
+        trainee_id: raw.trainee_id,
+        trainee_name: raw.trainee_name,
+        batch_id: raw.batch_id,
+        attempt_number: raw.attempt_number,
+        max_attempts: raw.max_attempts,
+        status: raw.status,
+        score: raw.score !== null ? Number(raw.score) : null,
+        avg_time_per_session: raw.avg_time_per_session,
+        is_live: raw.is_live,
+        indicator_scores: raw.performance_indicators.map(ind => ({
+          indicator_id: ind.indicator_id,
+          name: ind.name,
+          measurement: ind.measurement,
+          weight: Number(ind.weight),
+          score: ind.score !== null ? Number(ind.score) : null,
+        })),
+        past_attempts: raw.past_attempts.map(p => ({
+          id: p.id,
+          attempt_number: p.attempt_number,
+          score: p.score !== null ? Number(p.score) : null,
+        })),
+        report: raw.report,
+      }))
+    );
   }
 
-  // POST / — start a new attempt (attempt_number computed server-side, is_live set true)
-  create(payload: CreateAttemptPayload): Observable<ModuleAttempt> {
-    return this.http.post<ModuleAttempt>(`${this.baseUrl}/`, payload);
+  create(payload: { trainee_id: number; module_id: number; batch_id: number }) {
+    return this.http.post(this.baseUrl, payload);
   }
 
-  // PUT /:id — update status / score / is_live
-  update(id: number, payload: UpdateAttemptPayload): Observable<ModuleAttempt> {
-    return this.http.put<ModuleAttempt>(`${this.baseUrl}/${id}`, payload);
+  update(id: number, payload: Partial<{ status: string; score: number; is_live: boolean }>) {
+    return this.http.put(`${this.baseUrl}/${id}`, payload);
   }
 
-  // GET /:id/events — full event log
-  getEvents(id: number): Observable<AttemptEvent[]> {
-    return this.http.get<AttemptEvent[]>(`${this.baseUrl}/${id}/events`);
+  getEvents(id: number): Observable<{ id: number; event_type: string; description: string; is_error: boolean; created_at: string }[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/${id}/events`);
   }
 
-  // POST /:id/events — append an event
-  addEvent(id: number, event: CreateAttemptEventPayload): Observable<AttemptEvent> {
-    return this.http.post<AttemptEvent>(`${this.baseUrl}/${id}/events`, event);
+  addEvent(id: number, payload: { event_type: string; description: string; is_error: boolean }) {
+    return this.http.post(`${this.baseUrl}/${id}/events`, payload);
   }
 
-  // GET /:id/live (WebSocket)
   connectLive(id: number): WebSocket {
     const wsUrl = environment.apiUrl.replace(/^http/, 'ws');
     return new WebSocket(`${wsUrl}/attempts/${id}/live`);

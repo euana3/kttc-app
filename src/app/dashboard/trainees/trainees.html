@@ -1,0 +1,32 @@
+<div class="trainees-page">
+
+  <header class="page-header">
+    <h1>Learners</h1>
+  </header>
+
+  <div class="intro-panel">
+    <span class="intro-label">ENROLMENT & COMPLETIONS / BY CATEGORY</span>
+    <p>Open a batch below to see individual trainee progress and live sessions.</p>
+  </div>
+
+  <section class="batches-section">
+    <h2>Batches</h2>
+
+    @if (loading()) {
+      <p class="empty-text">Loading batches...</p>
+    } @else if (batches().length === 0) {
+      <p class="empty-text">No batches found.</p>
+    } @else {
+      <div class="batch-grid">
+        @for (batch of batches(); track batch.id) {
+          <div class="batch-card" (click)="openBatch(batch.id)">
+            <span class="batch-label">{{ batch.course_name }} / {{ batch.name }}</span>
+            <p class="batch-dates">{{ formatDate(batch.start_date) }} - {{ formatDate(batch.end_date) }}</p>
+            <!-- <span class="trainee-pill">{{ batch.trainee_count }} TRAINEES</span> -->
+          </div>
+        }
+      </div>
+    }
+  </section>
+
+</div>

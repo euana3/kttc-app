@@ -1,6 +1,12 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CoursesService, Course } from '../../services/courses';
+import { BatchWithCourseName } from '../../services/batches';
+
+export interface CoursesListResponse {
+  courses: Course[];
+  batches: BatchWithCourseName[];
+}
 
 @Component({
   selector: 'app-courses',
@@ -20,17 +26,17 @@ export class Courses implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.coursesService.getAll().subscribe({
-      next: (res: any) => {
-        this.courses.set(res.courses ?? res);
-        this.loading.set(false);
-      },
-      error: (err) => {
-        console.error('Failed to load courses', err);
-        this.loading.set(false);
-      },
-    });
-  }
+  this.coursesService.getAll().subscribe({
+    next: (res) => {
+      this.courses.set(res.courses);   // no more `?? res` guessing
+      this.loading.set(false);
+    },
+    error: (err) => {
+      console.error('Failed to load courses', err);
+      this.loading.set(false);
+    },
+  });
+}
 
   protected goToNewModule(): void {
     this.router.navigate(['/dashboard/modules/new']);

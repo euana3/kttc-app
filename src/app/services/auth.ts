@@ -15,7 +15,7 @@ export class AuthService {
   // Login function that sends username and password to the backend and handles response
   loginWithUsername(username: string, password: string): Observable<any> {
     const payload = { username, password }
-    return this.http.post(`${environment.apiUrl}/login`, payload);
+    return this.http.post(`${environment.baseUrl}/login`, payload);
   }
 
   // ====================== Permission Handling ======================

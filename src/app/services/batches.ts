@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../environment/environment';
 import { Trainee } from './trainees';
+import { CoursesListResponse } from '../dashboard/courses/courses';
 
 export interface Batch {
   id: number;
@@ -35,6 +36,10 @@ export interface BatchDetail extends Batch {
 
 export type BatchStatusFilter = 'active' | 'upcoming';
 
+export interface BatchWithCourseName extends Batch {
+  course_name: string;
+}
+
 export interface CreateBatchPayload {
   course_id: number;
   name: string;
@@ -53,9 +58,9 @@ export class BatchesService {
   constructor(private http: HttpClient) {}
 
   // GET /?status=active|upcoming
-  getAll(status?: BatchStatusFilter): Observable<Batch[]> {
-    const url = status ? `${this.baseUrl}/?status=${status}` : `${this.baseUrl}/`;
-    return this.http.get<Batch[]>(url);
+  // GET / — all courses, plus every batch (Courses management page)
+  getAll(): Observable<CoursesListResponse> {
+    return this.http.get<CoursesListResponse>(`${this.baseUrl}/`);
   }
 
   // GET /:id — full batch detail
@@ -87,4 +92,6 @@ export class BatchesService {
   unenrollTrainee(batchId: number, traineeId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${batchId}/trainees/${traineeId}`);
   }
+
+  
 }

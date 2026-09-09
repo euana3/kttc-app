@@ -1,0 +1,76 @@
+<div class="trainee-detail-page">
+
+  @if (detail(); as d) {
+    <header class="page-header">
+      <h1>{{ d.trainee.name }} / Batch {{ batchId }}</h1>
+    </header>
+
+    @if (d.live_event_log) {
+      <div class="live-badge">
+        <span class="live-dot"></span>
+        Live now
+      </div>
+    }
+
+    <div class="detail-columns">
+
+      <div class="left-column">
+        <div class="stats-panel">
+          <span class="panel-label">TRAINEE OVERALL STATS</span>
+          <p class="stat-caption">Average time per session</p>
+          <strong class="stat-value">{{ d.overall_stats.average_score ?? '—' }}</strong>
+        </div>
+
+        <div class="learning-path-panel">
+          <span class="panel-label">LEARNING PATH</span>
+
+          <div class="learning-path-list">
+            @for (entry of d.learning_path; track entry.module_id) {
+              <div
+                class="learning-path-row"
+                [class.disabled]="entry.status === 'not_started'"
+                (click)="openAttempt(entry.attempt_id)"
+              >
+                <span class="module-name">{{ entry.module_name }}</span>
+
+                @if (entry.attempt_number !== null) {
+                  <span class="attempt-count">Attempts: {{ entry.attempt_number }}/3</span>
+                }
+
+                <span class="status-badge" [class]="statusBadgeClass(entry.status)">
+                  {{ statusLabel(entry.status) }}
+                </span>
+
+                <span class="chevron">›</span>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      @if (d.live_event_log; as log) {
+        <div class="right-column">
+          <div class="events-panel">
+            <span class="panel-label">LIVE EVENT LOGS</span>
+
+            <div class="event-list">
+              @for (event of log.events; track event.id) {
+                <div class="event-row" [class.error]="event.is_error">
+                  <span class="event-icon">{{ event.is_error ? '✕' : '✓' }}</span>
+                  <span>{{ event.description }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+    </div>
+
+  } @else if (loading()) {
+    <p class="empty-text">Loading trainee details...</p>
+  } @else {
+    <p class="empty-text">Trainee data not found.</p>
+  }
+
+</div>
