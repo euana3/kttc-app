@@ -75,6 +75,10 @@
 
   <div class="copilot-content">
     <span class="copilot-label">AI TRAINING COPILOT</span>
+     @if (chatMessages().length > 0) {
+      <button type="button" class="copilot-new-chat" (click)="newChat()">+ New chat</button>
+    }
+  
     <h2>What would you like to know?</h2>
     <p>Ask questions about courses, trainees, training schedules, performance or reports using natural language.</p>
 

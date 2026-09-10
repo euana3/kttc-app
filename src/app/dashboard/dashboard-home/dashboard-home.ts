@@ -146,6 +146,13 @@ export class DashboardHome implements OnInit {
     this.router.navigate([route]);
   }
 
+  protected newChat(): void {
+  this.chatMessages.set([]);
+  this.chatDraft.set('');
+  this.chatError.set(null);
+  this.sendingMessage.set(false);
+  }
+
   protected askCopilot(): void {
     const message = this.chatDraft().trim();
     if (!message || this.sendingMessage()) return;
@@ -153,6 +160,7 @@ export class DashboardHome implements OnInit {
     this.sendingMessage.set(true);
     this.chatError.set(null);
 
+    
     // Show the user's message immediately rather than waiting on the round trip
     const optimisticUserMsg: ChatMessage = {
       id: -Date.now(),

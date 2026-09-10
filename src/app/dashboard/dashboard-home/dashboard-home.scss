@@ -304,6 +304,34 @@
   .copilot-dot { animation: none; opacity: 0.7; }
 }
 
+
+.copilot-header-row {
+  display: block;
+}
+
+.copilot-label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.copilot-new-chat {
+  display: inline-block;
+  background: none;
+  border: 1px solid rgba(139, 152, 184, 0.25);
+  color: #74c0fc;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.copilot-new-chat:hover {
+  border-color: #74c0fc;
+  background: rgba(77, 171, 247, 0.08);
+}
+
 /* ===================================== */
 /* LOWER PANELS */
 /* ===================================== */
