@@ -38,10 +38,14 @@ export class BatchDetail implements OnInit {
   }
 
   protected statusClass(status: string): string {
-    return status; // 'live' | 'attention' | 'ok' — matches CSS classes directly
+    return status;
   }
 
   protected openTrainee(traineeId: number): void {
     this.router.navigate(['/dashboard/trainees/batches', this.batchId, 'trainee', traineeId]);
+  }
+
+  protected goBack(): void {
+    this.router.navigate(['/dashboard/trainees']);
   }
 }

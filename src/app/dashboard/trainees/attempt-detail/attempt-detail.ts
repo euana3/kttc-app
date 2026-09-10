@@ -1,5 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
 import { AttemptsService, AttemptDetail as AttemptDetailModel } from '../../../services/attempts';
 
 @Component({
@@ -17,6 +18,8 @@ export class AttemptDetail implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
+    private location: Location,
     private attemptsService: AttemptsService,
   ) {}
 
@@ -42,6 +45,21 @@ export class AttemptDetail implements OnInit {
 
   protected suggestionLines(suggestions: string | null): string[] {
     if (!suggestions) return [];
-    return suggestions.split('\n').filter(line => line.trim().length > 0);
+    return suggestions
+      .split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0)
+      .map(line => line.replace(/^\d+[\.\)\-]\s*/, ''));
+  }
+
+  protected goBack(): void {
+    const a = this.attempt();
+    if (a) {
+      // Prefer a precise route back to the exact trainee this attempt belongs to
+      this.router.navigate(['/dashboard/trainees/batches', a.batch_id, 'trainee', a.trainee_id]);
+    } else {
+      // Fallback if attempt hasn't loaded yet (e.g. still in flight, or direct link)
+      this.location.back();
+    }
   }
 }

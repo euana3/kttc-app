@@ -18,11 +18,6 @@ export class TraineeDetail implements OnInit, OnDestroy {
   protected batchId!: number;
   protected traineeId!: number;
 
-  // Live video feed — placeholder only until the streaming protocol is confirmed.
-  // Unity is sending frames as byte[], which points toward raw frames over a
-  // WebSocket/binary channel rendered onto <canvas>, not a <video src>.
-  // TODO once confirmed: connect here, decode each incoming frame (likely a
-  // Blob/ArrayBuffer → createImageBitmap → ctx.drawImage), and flip streamConnected(true).
   protected readonly streamCanvas = viewChild<ElementRef<HTMLCanvasElement>>('streamCanvas');
   protected readonly streamConnected = signal(false);
 
@@ -45,7 +40,6 @@ export class TraineeDetail implements OnInit, OnDestroy {
         this.loading.set(false);
         if (detail.live_event_log) {
           this.connectLiveSocket(detail.live_event_log.attempt_id);
-          // this.connectVideoStream(detail.live_event_log.attempt_id); // once protocol is confirmed
         }
       },
       error: (err) => {
@@ -109,5 +103,9 @@ export class TraineeDetail implements OnInit, OnDestroy {
   protected openAttempt(attemptId: number | null): void {
     if (!attemptId) return;
     this.router.navigate(['/dashboard/trainees/attempts', attemptId]);
+  }
+
+  protected goBack(): void {
+    this.router.navigate(['/dashboard/trainees/batches', this.batchId]);
   }
 }

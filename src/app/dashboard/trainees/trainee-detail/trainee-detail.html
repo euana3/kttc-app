@@ -2,6 +2,7 @@
 
   @if (detail(); as d) {
     <header class="page-header">
+      <button type="button" class="back-button" (click)="goBack()">← Back</button>
       <h1>{{ d.trainee.name }} / Batch {{ batchId }}</h1>
     </header>
 

@@ -2,6 +2,7 @@
 
   @if (batch(); as b) {
     <header class="page-header">
+      <button type="button" class="back-button" (click)="goBack()">← Back</button>
       <h1>{{ b.name }}</h1>
     </header>
 
