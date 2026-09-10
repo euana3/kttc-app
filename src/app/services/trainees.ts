@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../environment/environment';
 import { AttemptStatus } from './attempts';
 
@@ -16,26 +16,28 @@ export interface CreateTraineePayload {
   email?: string;
 }
 
-// One row in the trainee's "learning path" — one module attempt, in course order
+// One row in the trainee's "learning path" — one module attempt, in course order.
+// Confirmed against GET /api/trainees/1/batches/1: attempt_number is always a real
+// number (0 = not yet attempted, never null), status is exactly AttemptStatus.
 export interface LearningPathEntry {
   module_id: number;
   module_name: string;
   attempt_id: number | null;
-  attempt_number: number | null;
-  status: AttemptStatus | 'not_started';
+  attempt_number: number;
+  max_attempts: number;
+  status: AttemptStatus;
   score: number | null;
+  is_live: boolean;
 }
 
 export interface TraineeBatchDetail {
   trainee: Trainee;
   batch_id: number;
   overall_stats: {
-    completed_modules: number;
-    total_modules: number;
-    average_score: number | null;
+    avg_time_per_session: string | null;
   };
   learning_path: LearningPathEntry[];
-  live_event_log?: { // present only if trainee has a live attempt right now
+  live_event_log?: {
     attempt_id: number;
     events: Array<{
       id: number;
@@ -45,6 +47,33 @@ export interface TraineeBatchDetail {
       created_at: string;
     }>;
   };
+}
+
+// Shape as actually returned by GET /api/trainees/:id/batches/:batchId — confirmed
+// via Postman. "stats" not "overall_stats", flat live_attempt_id/live_events, score as string.
+interface RawTraineeBatchDetail {
+  trainee: Trainee;
+  batch: { id: number; course_id: number; name: string; course_name: string };
+  stats: { avg_time_per_session: string | null };
+  learning_path: {
+    attempt_id: number | null;
+    module_id: number;
+    module_name: string;
+    attempt_number: number;
+    max_attempts: number;
+    status: AttemptStatus;
+    score: string | null;
+    is_live: boolean;
+  }[];
+  live_attempt_id: number | null;
+  live_events: Array<{
+    id: number;
+    attempt_id: number;
+    event_type: string;
+    description: string;
+    is_error: boolean;
+    created_at: string;
+  }>;
 }
 
 @Injectable({
@@ -81,8 +110,22 @@ export class TraineesService {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
   }
 
-  // GET /:id/batches/:batchId — trainee-detail page payload
+  // GET /:id/batches/:batchId — trainee-detail page payload, mapped from the real
+  // raw shape (RawTraineeBatchDetail) into what trainee-detail.html actually consumes
   getBatchDetail(traineeId: number, batchId: number): Observable<TraineeBatchDetail> {
-    return this.http.get<TraineeBatchDetail>(`${this.baseUrl}/${traineeId}/batches/${batchId}`);
+    return this.http.get<RawTraineeBatchDetail>(`${this.baseUrl}/${traineeId}/batches/${batchId}`).pipe(
+      map(raw => ({
+        trainee: raw.trainee,
+        batch_id: raw.batch.id,
+        overall_stats: raw.stats,
+        learning_path: raw.learning_path.map(entry => ({
+          ...entry,
+          score: entry.score !== null ? Number(entry.score) : null,
+        })),
+        live_event_log: raw.live_attempt_id
+          ? { attempt_id: raw.live_attempt_id, events: raw.live_events }
+          : undefined,
+      }))
+    );
   }
 }

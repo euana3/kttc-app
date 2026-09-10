@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../environment/environment';
-import { Batch } from './batches';
+import { BatchesService } from './batches';
 import { CourseModule } from './modules';
 
 export interface Course {
@@ -29,6 +29,14 @@ export interface CreateCoursePayload {
   module_ids?: number[];
   prerequisite_course_ids?: number[];
   trainee_ids?: number[]; // if given, also creates Batch 1 and enrolls them
+}
+export interface Batch {
+  id: number;
+  course_id: number;
+  name: string;
+  start_date: string | null;
+  end_date: string | null;
+  created_at: string;
 }
 
 @Injectable({

@@ -18,7 +18,7 @@
         <div class="stats-panel">
           <span class="panel-label">TRAINEE OVERALL STATS</span>
           <p class="stat-caption">Average time per session</p>
-          <strong class="stat-value">{{ d.overall_stats.average_score ?? '—' }}</strong>
+          <strong class="stat-value">{{ d.overall_stats.avg_time_per_session ?? '—' }}</strong>
         </div>
 
         <div class="learning-path-panel">
@@ -28,13 +28,13 @@
             @for (entry of d.learning_path; track entry.module_id) {
               <div
                 class="learning-path-row"
-                [class.disabled]="entry.status === 'not_started'"
+                [class.disabled]="entry.status === 'to_do'"
                 (click)="openAttempt(entry.attempt_id)"
               >
                 <span class="module-name">{{ entry.module_name }}</span>
 
-                @if (entry.attempt_number !== null) {
-                  <span class="attempt-count">Attempts: {{ entry.attempt_number }}/3</span>
+                @if (entry.attempt_number > 0) {
+                  <span class="attempt-count">Attempts: {{ entry.attempt_number }}/{{ entry.max_attempts }}</span>
                 }
 
                 <span class="status-badge" [class]="statusBadgeClass(entry.status)">
