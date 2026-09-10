@@ -61,7 +61,11 @@
 
               @if (!streamConnected()) {
                 <div class="stream-placeholder">
-                  <span class="stream-dot"></span>
+                  <div class="stream-dots">
+                    <span class="stream-dot"></span>
+                    <span class="stream-dot"></span>
+                    <span class="stream-dot"></span>
+                  </div>
                   <p>Waiting for live stream</p>
                   <span class="stream-note">No feed connected yet</span>
                 </div>
