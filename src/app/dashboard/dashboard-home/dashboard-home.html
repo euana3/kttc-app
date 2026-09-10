@@ -53,7 +53,7 @@
 <section class="feature-grid">
   @for (card of dashboardCards(); track card.title) {
     @if (card.enabled) {
-      <article class="feature-card" [class]="card.color" (click)="navigateTo(card.route)">
+      <article class="feature-card" [class]="card.color" (click)="handleCardClick(card)">
         <div class="feature-icon">
           <svg [lucideIcon]="card.icon" [size]="28"></svg>
         </div>
@@ -68,17 +68,19 @@
 </section>
 
 
-<section class="copilot-card">
+<section class="copilot-card" #copilotSection>
   <div class="copilot-icon">
     <svg [lucideIcon]="botIcon" [size]="24"></svg>
   </div>
 
   <div class="copilot-content">
-    <span class="copilot-label">AI TRAINING COPILOT</span>
-     @if (chatMessages().length > 0) {
-      <button type="button" class="copilot-new-chat" (click)="newChat()">+ New chat</button>
-    }
-  
+    <div class="copilot-header-row">
+      <span class="copilot-label">AI TRAINING COPILOT</span>
+      @if (chatMessages().length > 0) {
+        <button type="button" class="copilot-new-chat" (click)="newChat()">+ New chat</button>
+      }
+    </div>
+
     <h2>What would you like to know?</h2>
     <p>Ask questions about courses, trainees, training schedules, performance or reports using natural language.</p>
 

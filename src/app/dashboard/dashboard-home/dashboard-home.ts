@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import {
@@ -40,6 +40,7 @@ interface DashboardCard {
   icon: IconType;
   color: string;
   route?: string;
+  action?: 'navigate' | 'scroll'; // 'scroll' targets a section already on this page
   enabled: boolean;
 }
 
@@ -85,7 +86,7 @@ export class DashboardHome implements OnInit {
       description: 'Ask questions and retrieve training information using natural language.',
       icon: LucideBot,
       color: 'cyan',
-      route: '/copilot',
+      action: 'scroll', // scrolls to .copilot-card further down this same page
       enabled: true
     },
     {
@@ -122,35 +123,43 @@ export class DashboardHome implements OnInit {
     }
   ]);
 
-  // Copilot quick-ask widget state
   protected readonly chatMessages = signal<ChatMessage[]>([]);
   protected readonly chatDraft = signal('');
   protected readonly sendingMessage = signal(false);
   protected readonly chatError = signal<string | null>(null);
+
+  private readonly copilotSection = viewChild<ElementRef<HTMLElement>>('copilotSection');
 
   constructor(private router: Router, private chatService: ChatService) {}
 
   ngOnInit(): void {
     this.chatService.getHistory().subscribe({
       next: (messages) => {
-        // Show only the most recent exchange on the dashboard widget — a full
-        // transcript view belongs on the dedicated Copilot page (/copilot).
         this.chatMessages.set(messages.slice(-4));
       },
       error: (err) => console.error('Failed to load chat history', err),
     });
   }
 
-  protected navigateTo(route?: string): void {
-    if (!route) return;
-    this.router.navigate([route]);
+  protected handleCardClick(card: DashboardCard): void {
+    if (card.action === 'scroll') {
+      this.scrollToCopilot();
+      return;
+    }
+    if (card.route) {
+      this.router.navigate([card.route]);
+    }
+  }
+
+  private scrollToCopilot(): void {
+    this.copilotSection()?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   protected newChat(): void {
-  this.chatMessages.set([]);
-  this.chatDraft.set('');
-  this.chatError.set(null);
-  this.sendingMessage.set(false);
+    this.chatMessages.set([]);
+    this.chatDraft.set('');
+    this.chatError.set(null);
+    this.sendingMessage.set(false);
   }
 
   protected askCopilot(): void {
@@ -160,8 +169,6 @@ export class DashboardHome implements OnInit {
     this.sendingMessage.set(true);
     this.chatError.set(null);
 
-    
-    // Show the user's message immediately rather than waiting on the round trip
     const optimisticUserMsg: ChatMessage = {
       id: -Date.now(),
       trainer_id: null,
