@@ -78,9 +78,44 @@
     <h2>What would you like to know?</h2>
     <p>Ask questions about courses, trainees, training schedules, performance or reports using natural language.</p>
 
+    @if (chatMessages().length > 0) {
+      <div class="copilot-transcript">
+        @for (msg of chatMessages(); track msg.id) {
+          <div class="copilot-message" [class.assistant]="msg.role === 'assistant'">
+            <span class="copilot-message-role">{{ msg.role === 'assistant' ? 'Copilot' : 'You' }}</span>
+            <p>{{ msg.content }}</p>
+          </div>
+        }
+
+        @if (sendingMessage()) {
+          <div class="copilot-message assistant">
+            <span class="copilot-message-role">Copilot</span>
+            <div class="copilot-thinking">
+              <span class="copilot-dot"></span>
+              <span class="copilot-dot"></span>
+              <span class="copilot-dot"></span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    @if (chatError()) {
+      <p class="copilot-error">{{ chatError() }}</p>
+    }
+
     <div class="copilot-input">
-      <input type="text" placeholder="Ask something like: Which trainees are behind schedule?" />
-      <button>Ask Copilot</button>
+      <input
+        type="text"
+        placeholder="Ask something like: Which trainees are behind schedule?"
+        [ngModel]="chatDraft()"
+        (ngModelChange)="chatDraft.set($event)"
+        (keydown.enter)="askCopilot()"
+        [disabled]="sendingMessage()"
+      />
+      <button (click)="askCopilot()" [disabled]="sendingMessage() || !chatDraft().trim()">
+        {{ sendingMessage() ? 'Asking…' : 'Ask Copilot' }}
+      </button>
     </div>
   </div>
 </section>

@@ -11,15 +11,16 @@ export interface ChatMessage {
   created_at: string;
 }
 
-export interface SendChatMessagePayload {
+export interface SendMessagePayload {
   message: string;
   trainer_id?: number;
 }
 
-export interface SendChatMessageResponse {
-  reply: ChatMessage;
-  userMessage: ChatMessage;
-}
+// ASSUMPTION: the guide only says POST / "returns the assistant's reply and persists
+// both sides" — not the exact JSON shape. Assuming it returns the new assistant
+// ChatMessage row (same shape as a GET /history item). Verify via Postman if
+// responses come back unexpectedly empty/undefined.
+export interface SendMessageResponse extends ChatMessage {}
 
 @Injectable({
   providedIn: 'root',
@@ -35,8 +36,8 @@ export class ChatService {
     return this.http.get<ChatMessage[]>(`${this.baseUrl}/history`);
   }
 
-  // POST / — send a message, returns assistant reply
-  sendMessage(payload: SendChatMessagePayload): Observable<SendChatMessageResponse> {
-    return this.http.post<SendChatMessageResponse>(`${this.baseUrl}/`, payload);
+  // POST / — send a message, get the assistant's reply back
+  sendMessage(payload: SendMessagePayload): Observable<SendMessageResponse> {
+    return this.http.post<SendMessageResponse>(`${this.baseUrl}/`, payload);
   }
 }

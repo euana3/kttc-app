@@ -1,5 +1,6 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import {
   LucideDynamicIcon,
   LucideGraduationCap,
@@ -16,6 +17,7 @@ import {
   LucideCircleAlert,
   LucideInfo,
 } from '@lucide/angular';
+import { ChatService, ChatMessage } from '../../services/chat';
 
 type IconType =
   | typeof LucideGraduationCap
@@ -44,11 +46,11 @@ interface DashboardCard {
 @Component({
   selector: 'app-dashboard-home',
   standalone: true,
-  imports: [LucideDynamicIcon],
+  imports: [LucideDynamicIcon, FormsModule],
   templateUrl: './dashboard-home.html',
   styleUrl: './dashboard-home.scss'
 })
-export class DashboardHome {
+export class DashboardHome implements OnInit {
 
   protected readonly graduationCapIcon: IconType = LucideGraduationCap;
   protected readonly calendarIcon: IconType = LucideCalendar;
@@ -67,7 +69,7 @@ export class DashboardHome {
       description: 'View your courses, progress, assessments and upcoming training.',
       icon: LucideGraduationCap,
       color: 'blue',
-      route: 'dashboard/trainees',
+      route: '/dashboard/trainees',
       enabled: true
     },
     {
@@ -120,10 +122,58 @@ export class DashboardHome {
     }
   ]);
 
-  constructor(private router: Router) {}
+  // Copilot quick-ask widget state
+  protected readonly chatMessages = signal<ChatMessage[]>([]);
+  protected readonly chatDraft = signal('');
+  protected readonly sendingMessage = signal(false);
+  protected readonly chatError = signal<string | null>(null);
+
+  constructor(private router: Router, private chatService: ChatService) {}
+
+  ngOnInit(): void {
+    this.chatService.getHistory().subscribe({
+      next: (messages) => {
+        // Show only the most recent exchange on the dashboard widget — a full
+        // transcript view belongs on the dedicated Copilot page (/copilot).
+        this.chatMessages.set(messages.slice(-4));
+      },
+      error: (err) => console.error('Failed to load chat history', err),
+    });
+  }
 
   protected navigateTo(route?: string): void {
     if (!route) return;
     this.router.navigate([route]);
+  }
+
+  protected askCopilot(): void {
+    const message = this.chatDraft().trim();
+    if (!message || this.sendingMessage()) return;
+
+    this.sendingMessage.set(true);
+    this.chatError.set(null);
+
+    // Show the user's message immediately rather than waiting on the round trip
+    const optimisticUserMsg: ChatMessage = {
+      id: -Date.now(),
+      trainer_id: null,
+      role: 'user',
+      content: message,
+      created_at: new Date().toISOString(),
+    };
+    this.chatMessages.update(msgs => [...msgs, optimisticUserMsg].slice(-4));
+    this.chatDraft.set('');
+
+    this.chatService.sendMessage({ message }).subscribe({
+      next: (reply) => {
+        this.chatMessages.update(msgs => [...msgs, reply].slice(-4));
+        this.sendingMessage.set(false);
+      },
+      error: (err) => {
+        console.error('Copilot request failed', err);
+        this.chatError.set('Copilot is unavailable right now — try again shortly.');
+        this.sendingMessage.set(false);
+      },
+    });
   }
 }

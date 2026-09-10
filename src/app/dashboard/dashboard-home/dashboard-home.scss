@@ -226,6 +226,83 @@
   cursor: pointer;
 }
 
+.copilot-transcript {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 14px 0;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.copilot-message {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: rgba(139, 152, 184, 0.08);
+  align-self: flex-end;
+  max-width: 85%;
+}
+
+.copilot-message.assistant {
+  align-self: flex-start;
+  background: rgba(77, 171, 247, 0.1);
+}
+
+.copilot-message-role {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #8b98b8;
+  margin-bottom: 4px;
+}
+
+.copilot-message p {
+  margin: 0;
+  font-size: 13px;
+  color: #e6edf7;
+  line-height: 1.5;
+}
+
+.copilot-thinking {
+  display: flex;
+  gap: 6px;
+  padding: 4px 0;
+}
+
+.copilot-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #74c0fc;
+  animation: copilot-dot-bounce 1.2s ease-in-out infinite;
+}
+
+.copilot-dot:nth-child(1) { animation-delay: 0s; }
+.copilot-dot:nth-child(2) { animation-delay: 0.15s; }
+.copilot-dot:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes copilot-dot-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-5px); opacity: 1; }
+}
+
+.copilot-error {
+  font-size: 12px;
+  color: #ff6b81;
+  margin: 8px 0 0;
+}
+
+.copilot-input input:disabled,
+.copilot-input button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .copilot-dot { animation: none; opacity: 0.7; }
+}
 
 /* ===================================== */
 /* LOWER PANELS */
