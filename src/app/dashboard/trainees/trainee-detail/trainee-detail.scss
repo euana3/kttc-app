@@ -136,14 +136,14 @@
   color: #ff922b;
 }
 
-.status-badge.todo {
-  background: rgba(139, 152, 184, 0.15);
-  color: #8b98b8;
-}
-
 .status-badge.failed {
   background: rgba(255, 107, 129, 0.15);
   color: #ff6b81;
+}
+
+.status-badge.todo {
+  background: rgba(139, 152, 184, 0.15);
+  color: #8b98b8;
 }
 
 .chevron {
@@ -171,6 +171,65 @@
 
 .event-icon {
   font-size: 13px;
+}
+
+// Live video feed panel — placeholder only until the streaming protocol is confirmed
+.stream-panel {
+  padding: 20px;
+  background: rgba(17, 27, 46, 0.72);
+  border: 1px solid rgba(139, 152, 184, 0.12);
+  border-radius: 10px;
+}
+
+.stream-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  margin-top: 4px;
+  background: #0b111d;
+  border: 1px solid rgba(139, 152, 184, 0.15);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stream-canvas,
+.stream-video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.stream-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: #8b98b8;
+}
+
+.stream-placeholder p {
+  margin: 0;
+  font-size: 13px;
+  color: #e6edf7;
+}
+
+.stream-note {
+  font-size: 11px;
+  color: #8b98b8;
+}
+
+.stream-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #8b98b8;
+  margin-bottom: 4px;
 }
 
 @media (max-width: 900px) {

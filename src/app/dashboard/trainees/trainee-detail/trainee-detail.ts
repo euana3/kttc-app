@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TraineesService, TraineeBatchDetail } from '../../../services/trainees';
 import { AttemptsService } from '../../../services/attempts';
@@ -17,6 +17,14 @@ export class TraineeDetail implements OnInit, OnDestroy {
   protected readonly loading = signal(true);
   protected batchId!: number;
   protected traineeId!: number;
+
+  // Live video feed — placeholder only until the streaming protocol is confirmed.
+  // Unity is sending frames as byte[], which points toward raw frames over a
+  // WebSocket/binary channel rendered onto <canvas>, not a <video src>.
+  // TODO once confirmed: connect here, decode each incoming frame (likely a
+  // Blob/ArrayBuffer → createImageBitmap → ctx.drawImage), and flip streamConnected(true).
+  protected readonly streamCanvas = viewChild<ElementRef<HTMLCanvasElement>>('streamCanvas');
+  protected readonly streamConnected = signal(false);
 
   private liveSocket: WebSocket | null = null;
 
@@ -37,6 +45,7 @@ export class TraineeDetail implements OnInit, OnDestroy {
         this.loading.set(false);
         if (detail.live_event_log) {
           this.connectLiveSocket(detail.live_event_log.attempt_id);
+          // this.connectVideoStream(detail.live_event_log.attempt_id); // once protocol is confirmed
         }
       },
       error: (err) => {
@@ -62,9 +71,6 @@ export class TraineeDetail implements OnInit, OnDestroy {
         return;
       }
 
-      // Per the backend guide, POST /:id/events broadcasts { type: 'event', event }.
-      // Other message shapes (e.g. status changes from PUT /:id) aren't documented yet —
-      // logged rather than assumed, so nothing silently breaks if the shape differs.
       if (payload?.type === 'event' && payload.event) {
         this.detail.update(current => {
           if (!current?.live_event_log) return current;

@@ -67,7 +67,7 @@ export class DashboardHome {
       description: 'View your courses, progress, assessments and upcoming training.',
       icon: LucideGraduationCap,
       color: 'blue',
-      route: '/trainee',
+      route: 'dashboard/trainees',
       enabled: true
     },
     {

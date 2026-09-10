@@ -50,6 +50,25 @@
 
       @if (d.live_event_log; as log) {
         <div class="right-column">
+
+          <div class="stream-panel">
+            <span class="panel-label">LIVE VIDEO FEED</span>
+
+            <div class="stream-frame">
+              <canvas #streamCanvas class="stream-canvas"></canvas>
+
+              <video #streamVideo class="stream-video" style="display: none;" autoplay muted playsinline></video>
+
+              @if (!streamConnected()) {
+                <div class="stream-placeholder">
+                  <span class="stream-dot"></span>
+                  <p>Waiting for live stream</p>
+                  <span class="stream-note">No feed connected yet</span>
+                </div>
+              }
+            </div>
+          </div>
+
           <div class="events-panel">
             <span class="panel-label">LIVE EVENT LOGS</span>
 
