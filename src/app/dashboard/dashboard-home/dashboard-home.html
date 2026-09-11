@@ -6,7 +6,7 @@
     </span>
     <div>
       <span class="summary-label">Active Courses</span>
-      <strong>12</strong>
+      <strong>{{ summaryLoading() ? '—' : overview()?.active_courses ?? '—' }}</strong>
     </div>
   </div>
 
@@ -15,8 +15,8 @@
       <svg [lucideIcon]="checkIcon" [size]="20"></svg>
     </span>
     <div>
-      <span class="summary-label">Completed</span>
-      <strong>8</strong>
+      <span class="summary-label">Completed Courses</span>
+      <strong>{{ summaryLoading() ? '—' : overview()?.completed_total ?? '—' }}</strong>
     </div>
   </div>
 
@@ -25,8 +25,8 @@
       <svg [lucideIcon]="calendarIcon" [size]="20"></svg>
     </span>
     <div>
-      <span class="summary-label">Upcoming</span>
-      <strong>4</strong>
+      <span class="summary-label">Upcoming Batches</span>
+      <strong>{{ upcomingBatchCount() ?? '—' }}</strong>
     </div>
   </div>
 
@@ -35,8 +35,8 @@
       <svg [lucideIcon]="chartBarIcon" [size]="20"></svg>
     </span>
     <div>
-      <span class="summary-label">Overall Progress</span>
-      <strong>72%</strong>
+      <span class="summary-label">Overall Progress (Score)</span>
+      <strong>{{ summaryLoading() ? '—' : overview()?.avg_score ?? '—' }}</strong>
     </div>
   </div>
 

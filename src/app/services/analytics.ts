@@ -3,6 +3,17 @@ import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
 import { environment } from '../environment/environment';
 
+
+export interface DashboardOverview {
+  total_trainees: number;
+  active_courses: number;
+  completion_rate: number;
+  avg_score: number;
+  completed_total: number; // derived: sum of enrolment_by_category[].completed
+  enrolment_by_category: EnrolmentByCategory[];
+  recent_activity: RecentActivityItem[];
+}
+
 // ── Dashboard overview ──────────────────────────────────────────────────
 // Confirmed via GET /api/analytics/dashboard.
 export interface EnrolmentByCategory {
@@ -159,21 +170,26 @@ export class AnalyticsService {
 
   // GET /dashboard
   getDashboard(): Observable<DashboardOverview> {
-    return this.http.get<RawDashboardOverview>(`${this.baseUrl}/dashboard`).pipe(
-      map(raw => ({
+  return this.http.get<RawDashboardOverview>(`${this.baseUrl}/dashboard`).pipe(
+    map(raw => {
+      const enrolment_by_category = raw.enrolment_by_category.map(c => ({
+        course_name: c.course_name,
+        enrolled: Number(c.enrolled),
+        completed: Number(c.completed),
+      }));
+
+      return {
         total_trainees: raw.total_trainees,
         active_courses: raw.active_courses,
         completion_rate: raw.completion_rate,
         avg_score: raw.avg_score,
-        enrolment_by_category: raw.enrolment_by_category.map(c => ({
-          course_name: c.course_name,
-          enrolled: Number(c.enrolled),
-          completed: Number(c.completed),
-        })),
+        completed_total: enrolment_by_category.reduce((sum, c) => sum + c.completed, 0),
+        enrolment_by_category,
         recent_activity: raw.recent_activity,
-      }))
-    );
-  }
+      };
+    })
+  );
+}
 
   // GET /attention
   getAttention(): Observable<AttentionItem[]> {

@@ -18,6 +18,8 @@ import {
   LucideInfo,
 } from '@lucide/angular';
 import { ChatService, ChatMessage } from '../../services/chat';
+import { AnalyticsService, DashboardOverview } from '../../services/analytics';
+import { BatchesService } from '../../services/batches';
 
 type IconType =
   | typeof LucideGraduationCap
@@ -40,7 +42,7 @@ interface DashboardCard {
   icon: IconType;
   color: string;
   route?: string;
-  action?: 'navigate' | 'scroll'; // 'scroll' targets a section already on this page
+  action?: 'navigate' | 'scroll';
   enabled: boolean;
 }
 
@@ -86,7 +88,7 @@ export class DashboardHome implements OnInit {
       description: 'Ask questions and retrieve training information using natural language.',
       icon: LucideBot,
       color: 'cyan',
-      action: 'scroll', // scrolls to .copilot-card further down this same page
+      action: 'scroll',
       enabled: true
     },
     {
@@ -123,6 +125,15 @@ export class DashboardHome implements OnInit {
     }
   ]);
 
+  // ── Top summary stats ──────────────────────────────────────────────────
+  // Active Courses & Completed come from GET /api/analytics/dashboard.
+  // Overall Progress uses avg_score from the same endpoint (per your choice).
+  // Upcoming is repurposed as "Upcoming Batches" via GET /api/batches?status=upcoming
+  // — there's no "upcoming courses" concept on the backend, only batches.
+  protected readonly overview = signal<DashboardOverview | null>(null);
+  protected readonly upcomingBatchCount = signal<number | null>(null);
+  protected readonly summaryLoading = signal(true);
+
   protected readonly chatMessages = signal<ChatMessage[]>([]);
   protected readonly chatDraft = signal('');
   protected readonly sendingMessage = signal(false);
@@ -130,7 +141,12 @@ export class DashboardHome implements OnInit {
 
   private readonly copilotSection = viewChild<ElementRef<HTMLElement>>('copilotSection');
 
-  constructor(private router: Router, private chatService: ChatService) {}
+  constructor(
+    private router: Router,
+    private chatService: ChatService,
+    private analyticsService: AnalyticsService,
+    private batchesService: BatchesService,
+  ) {}
 
   ngOnInit(): void {
     this.chatService.getHistory().subscribe({
@@ -138,6 +154,25 @@ export class DashboardHome implements OnInit {
         this.chatMessages.set(messages.slice(-4));
       },
       error: (err) => console.error('Failed to load chat history', err),
+    });
+
+    this.analyticsService.getDashboard().subscribe({
+      next: (overview) => {
+        this.overview.set(overview);
+        this.summaryLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Failed to load dashboard overview', err);
+        this.summaryLoading.set(false);
+      },
+    });
+
+    this.batchesService.getAll('upcoming').subscribe({
+      next: (batches) => this.upcomingBatchCount.set(batches.length),
+      error: (err) => {
+        console.error('Failed to load upcoming batches', err);
+        this.upcomingBatchCount.set(null);
+      },
     });
   }
 
