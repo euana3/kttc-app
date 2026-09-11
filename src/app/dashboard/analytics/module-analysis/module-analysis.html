@@ -1,0 +1,60 @@
+<div class="module-analysis-page">
+
+  @if (analysis(); as a) {
+    <button type="button" class="back-button" (click)="goBack()">← Back</button>
+
+    @if (a.flagged) {
+      <div class="flagged-banner">
+        <span class="warning-icon">⚠</span>
+        Flagged for attention
+      </div>
+    }
+
+    @if (a.description) {
+      <p class="module-description">{{ a.description }}</p>
+    }
+
+    <div class="detail-columns">
+      <div class="stats-panel">
+        <span class="panel-label">MODULE GENERAL STATS</span>
+        <ul class="stats-list">
+          <li>Score: {{ a.average_score }}</li>
+          <li>Pass rate: {{ a.pass_rate }}%</li>
+          <li>Attempts recorded: {{ a.attempt_count }}</li>
+          @if (a.skills_learnt) {
+            <li>Skills learnt: {{ a.skills_learnt }}</li>
+          }
+          @if (a.estimated_time) {
+            <li>Estimated time: {{ a.estimated_time }}</li>
+          }
+        </ul>
+      </div>
+
+      @if (a.report) {
+        <div class="ai-panel">
+          <span class="panel-label">EVIDENCE AT A GLANCE / AI EXPLANATION & RECOMMENDED ACTIONS</span>
+          <ol class="suggestion-list">
+            @for (line of suggestionLines(a.report.suggestions); track line) {
+              <li>{{ line }}</li>
+            }
+          </ol>
+        </div>
+      }
+    </div>
+
+    @if (a.report) {
+      <section class="report-section">
+        <h2>Module Report</h2>
+        <div class="report-panel">
+          <p>{{ a.report.content }}</p>
+        </div>
+      </section>
+    }
+
+  } @else if (loading()) {
+    <p class="empty-text">Loading module analysis...</p>
+  } @else {
+    <p class="empty-text">Module analysis not found.</p>
+  }
+
+</div>

@@ -18,6 +18,10 @@ import { BatchDetail } from './dashboard/trainees/batch-detail/batch-detail';
 import { TraineeDetail } from './dashboard/trainees/trainee-detail/trainee-detail';
 import { AttemptDetail } from './dashboard/trainees/attempt-detail/attempt-detail';
 
+import { Analytics } from './dashboard/analytics/analytics';
+import { ModuleAnalysis } from './dashboard/analytics/module-analysis/module-analysis';
+import { CohortAnalysis } from './dashboard/analytics/cohort-analysis/cohort-analysis';
+
 export const routes: Routes = [
   { path: 'login', component: Login },
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -36,6 +40,9 @@ export const routes: Routes = [
       { path: 'trainees/batches/:batchId/trainee/:traineeId', component: TraineeDetail },
       { path: 'trainees/attempts/:attemptId', component: AttemptDetail },
 
+      { path: 'analytics', loadComponent: () => import('./dashboard/analytics/analytics').then(m => m.Analytics) },
+      { path: 'analytics/modules/:moduleId', loadComponent: () => import('./dashboard/analytics/module-analysis/module-analysis').then(m => m.ModuleAnalysis) },
+      { path: 'analytics/cohorts/:batchId', loadComponent: () => import('./dashboard/analytics/cohort-analysis/cohort-analysis').then(m => m.CohortAnalysis) },
     ],
   },
 

@@ -106,11 +106,11 @@ export class DashboardHome implements OnInit {
       enabled: true
     },
     {
-      title: 'Reports',
+      title: 'Analytics',
       description: 'Analyze training performance, completion and assessment results.',
       icon: LucideChartBar,
       color: 'pink',
-      route: '/reports',
+      route: '/dashboard/analytics',
       enabled: true
     },
     {

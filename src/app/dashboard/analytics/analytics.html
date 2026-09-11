@@ -1,0 +1,94 @@
+<div class="analytics-page">
+
+  @if (loading()) {
+    <p class="empty-text">Loading analytics...</p>
+  } @else if (overview(); as o) {
+
+    <section class="summary-section">
+      <div class="summary-grid">
+        <div class="summary-card">
+          <span class="summary-label">TOTAL TRAINEES</span>
+          <strong>{{ o.total_trainees }}</strong>
+        </div>
+        <div class="summary-card">
+          <span class="summary-label">ACTIVE COURSES</span>
+          <strong>{{ o.active_courses }}</strong>
+        </div>
+        <div class="summary-card">
+          <span class="summary-label">COMPLETION RATE</span>
+          <strong>{{ o.completion_rate }}%</strong>
+        </div>
+        <div class="summary-card">
+          <span class="summary-label">AVERAGE SCORE</span>
+          <strong>{{ o.avg_score }}</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="attention-section">
+      <h2>Needs attention</h2>
+
+      @if (attentionItems().length === 0) {
+        <p class="empty-text">Nothing needs attention right now.</p>
+      } @else {
+        <div class="attention-grid">
+          @for (item of attentionItems(); track item.type + '-' + item.id) {
+            <div class="attention-card" (click)="openAttentionItem(item)">
+              <span class="attention-title">
+                <svg [lucideIcon]="triangleAlertIcon" [size]="14"></svg>
+                {{ item.title }}
+              </span>
+              <p>{{ item.message }}</p>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+    <section class="enrolment-section">
+      <h2>Enrolment by category</h2>
+
+      <div class="enrolment-panel">
+        <table class="enrolment-table">
+          <thead>
+            <tr><th>Course</th><th>Enrolled</th><th>Completed</th></tr>
+          </thead>
+          <tbody>
+            @for (c of o.enrolment_by_category; track c.course_name) {
+              <tr>
+                <td>{{ c.course_name }}</td>
+                <td>{{ c.enrolled }}</td>
+                <td>{{ c.completed }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="activity-section">
+      <h2>Recent activity</h2>
+
+      @if (o.recent_activity.length === 0) {
+        <p class="empty-text">No recent activity.</p>
+      } @else {
+        <div class="activity-panel">
+          @for (item of o.recent_activity; track item.created_at + item.description) {
+            <div class="activity-row" [class.error]="item.is_error">
+              <span class="activity-icon">{{ item.is_error ? '✕' : '✓' }}</span>
+              <div class="activity-text">
+                <span>{{ item.trainee_name }} — {{ item.module_name }}</span>
+                <p>{{ item.description }}</p>
+              </div>
+              <span class="activity-time">{{ formatTime(item.created_at) }}</span>
+            </div>
+          }
+        </div>
+      }
+    </section>
+
+  } @else {
+    <p class="empty-text">Failed to load analytics.</p>
+  }
+
+</div>

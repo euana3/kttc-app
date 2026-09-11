@@ -21,7 +21,7 @@
 .trainee-detail-page {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
 }
 
 .page-header h1 {
@@ -60,20 +60,6 @@
   box-shadow: 0 0 8px rgba(47, 158, 110, 0.7);
 }
 
-.detail-columns {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 16px;
-  align-items: start;
-}
-
-.left-column,
-.right-column {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
 .panel-label {
   display: block;
   font-size: 11px;
@@ -85,7 +71,8 @@
 
 .stats-panel,
 .learning-path-panel,
-.events-panel {
+.events-panel,
+.stream-panel {
   padding: 20px;
   background: rgba(17, 27, 46, 0.72);
   border: 1px solid rgba(139, 152, 184, 0.12);
@@ -101,6 +88,85 @@
 .stat-value {
   font-size: 22px;
   color: #e6edf7;
+}
+
+// Live Video Feed + Live Event Logs — side by side
+.live-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+// Planned Analytics lives inside the Trainee Overall Stats panel,
+// separated by a divider rather than its own bordered box.
+.planned-metrics-block {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(139, 152, 184, 0.12);
+}
+
+.planned-metrics-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+  flex-wrap: wrap;
+}
+
+.planned-metrics-header h2 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #e6edf7;
+}
+
+.planned-badge {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #ff922b;
+  background: rgba(255, 146, 43, 0.12);
+  border: 1px solid rgba(255, 146, 43, 0.3);
+  padding: 2px 10px;
+  border-radius: 999px;
+}
+
+.planned-metrics-intro {
+  margin: 0 0 14px;
+  font-size: 12px;
+  color: #8b98b8;
+}
+
+.planned-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.planned-metric-card {
+  padding: 14px 16px;
+  background: rgba(17, 27, 46, 0.5);
+  border: 1px dashed rgba(139, 152, 184, 0.2);
+  border-radius: 10px;
+}
+
+.planned-metric-title {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: #74c0fc;
+  margin-bottom: 8px;
+}
+
+.planned-metric-card ul {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 12px;
+  color: #8b98b8;
+  line-height: 1.6;
 }
 
 .learning-path-list {
@@ -193,14 +259,6 @@
   font-size: 13px;
 }
 
-// Live video feed panel — placeholder only until the streaming protocol is confirmed
-.stream-panel {
-  padding: 20px;
-  background: rgba(17, 27, 46, 0.72);
-  border: 1px solid rgba(139, 152, 184, 0.12);
-  border-radius: 10px;
-}
-
 .stream-frame {
   position: relative;
   width: 100%;
@@ -281,7 +339,13 @@
 }
 
 @media (max-width: 900px) {
-  .detail-columns {
+  .live-columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .planned-metrics-grid {
     grid-template-columns: 1fr;
   }
 }

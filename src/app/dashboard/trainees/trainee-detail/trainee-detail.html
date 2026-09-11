@@ -13,83 +13,101 @@
       </div>
     }
 
-    <div class="detail-columns">
+    <div class="stats-panel">
+      <span class="panel-label">TRAINEE OVERALL STATS</span>
+      <p class="stat-caption">Average time per session</p>
+      <strong class="stat-value">{{ d.overall_stats.avg_time_per_session ?? '—' }}</strong>
 
-      <div class="left-column">
-        <div class="stats-panel">
-          <span class="panel-label">TRAINEE OVERALL STATS</span>
-          <p class="stat-caption">Average time per session</p>
-          <strong class="stat-value">{{ d.overall_stats.avg_time_per_session ?? '—' }}</strong>
+      <div class="planned-metrics-block">
+        <div class="planned-metrics-header">
+          <h2>Planned Trainee Analytics</h2>
+          <span class="planned-badge">Coming soon</span>
         </div>
+        <p class="planned-metrics-intro">
+          Reference only — these categories are not yet backed by the API.
+        </p>
 
-        <div class="learning-path-panel">
-          <span class="panel-label">LEARNING PATH</span>
-
-          <div class="learning-path-list">
-            @for (entry of d.learning_path; track entry.module_id) {
-              <div
-                class="learning-path-row"
-                [class.disabled]="entry.status === 'to_do'"
-                (click)="openAttempt(entry.attempt_id)"
-              >
-                <span class="module-name">{{ entry.module_name }}</span>
-
-                @if (entry.attempt_number > 0) {
-                  <span class="attempt-count">Attempts: {{ entry.attempt_number }}/{{ entry.max_attempts }}</span>
+        <div class="planned-metrics-grid">
+          @for (category of plannedMetrics(); track category.title) {
+            <div class="planned-metric-card">
+              <span class="planned-metric-title">{{ category.title }}</span>
+              <ul>
+                @for (item of category.items; track item) {
+                  <li>{{ item }}</li>
                 }
+              </ul>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
 
-                <span class="status-badge" [class]="statusBadgeClass(entry.status)">
-                  {{ statusLabel(entry.status) }}
-                </span>
+    <div class="learning-path-panel">
+      <span class="panel-label">LEARNING PATH</span>
 
-                <span class="chevron">›</span>
+      <div class="learning-path-list">
+        @for (entry of d.learning_path; track entry.module_id) {
+          <div
+            class="learning-path-row"
+            [class.disabled]="entry.status === 'to_do'"
+            (click)="openAttempt(entry.attempt_id)"
+          >
+            <span class="module-name">{{ entry.module_name }}</span>
+
+            @if (entry.attempt_number > 0) {
+              <span class="attempt-count">Attempts: {{ entry.attempt_number }}/{{ entry.max_attempts }}</span>
+            }
+
+            <span class="status-badge" [class]="statusBadgeClass(entry.status)">
+              {{ statusLabel(entry.status) }}
+            </span>
+
+            <span class="chevron">›</span>
+          </div>
+        }
+      </div>
+    </div>
+
+    @if (d.live_event_log; as log) {
+      <div class="live-columns">
+
+        <div class="stream-panel">
+          <span class="panel-label">LIVE VIDEO FEED</span>
+
+          <div class="stream-frame">
+            <canvas #streamCanvas class="stream-canvas"></canvas>
+
+            <video #streamVideo class="stream-video" style="display: none;" autoplay muted playsinline></video>
+
+            @if (!streamConnected()) {
+              <div class="stream-placeholder">
+                <div class="stream-dots">
+                  <span class="stream-dot"></span>
+                  <span class="stream-dot"></span>
+                  <span class="stream-dot"></span>
+                </div>
+                <p>Waiting for live stream…</p>
+                <span class="stream-note">No feed connected yet</span>
               </div>
             }
           </div>
         </div>
-      </div>
 
-      @if (d.live_event_log; as log) {
-        <div class="right-column">
+        <div class="events-panel">
+          <span class="panel-label">LIVE EVENT LOGS</span>
 
-          <div class="stream-panel">
-            <span class="panel-label">LIVE VIDEO FEED</span>
-
-            <div class="stream-frame">
-              <canvas #streamCanvas class="stream-canvas"></canvas>
-
-              <video #streamVideo class="stream-video" style="display: none;" autoplay muted playsinline></video>
-
-              @if (!streamConnected()) {
-                <div class="stream-placeholder">
-                  <div class="stream-dots">
-                    <span class="stream-dot"></span>
-                    <span class="stream-dot"></span>
-                    <span class="stream-dot"></span>
-                  </div>
-                  <p>Waiting for live stream</p>
-                  <span class="stream-note">No feed connected yet</span>
-                </div>
-              }
-            </div>
-          </div>
-
-          <div class="events-panel">
-            <span class="panel-label">LIVE EVENT LOGS</span>
-
-            <div class="event-list">
-              @for (event of log.events; track event.id) {
-                <div class="event-row" [class.error]="event.is_error">
-                  <span class="event-icon">{{ event.is_error ? '✕' : '✓' }}</span>
-                  <span>{{ event.description }}</span>
-                </div>
-              }
-            </div>
+          <div class="event-list">
+            @for (event of log.events; track event.id) {
+              <div class="event-row" [class.error]="event.is_error">
+                <span class="event-icon">{{ event.is_error ? '✕' : '✓' }}</span>
+                <span>{{ event.description }}</span>
+              </div>
+            }
           </div>
         </div>
-      }
 
-    </div>
+      </div>
+    }
 
   } @else if (loading()) {
     <p class="empty-text">Loading trainee details...</p>

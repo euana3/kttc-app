@@ -3,6 +3,11 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TraineesService, TraineeBatchDetail } from '../../../services/trainees';
 import { AttemptsService } from '../../../services/attempts';
 
+interface PlannedMetricCategory {
+  title: string;
+  items: string[];
+}
+
 @Component({
   selector: 'app-trainee-detail',
   standalone: true,
@@ -22,6 +27,72 @@ export class TraineeDetail implements OnInit, OnDestroy {
   protected readonly streamConnected = signal(false);
 
   private liveSocket: WebSocket | null = null;
+
+  // Reference only — not yet backed by any API endpoint. Planning diagram for
+  // per-trainee analytics. Do not wire this to real data until an endpoint exists.
+  protected readonly plannedMetrics = signal<PlannedMetricCategory[]>([
+    {
+      title: 'Progress Metrics',
+      items: [
+        'Completion rate',
+        'Failure point — where trainees fail at, and out of course',
+        'Enrolment data',
+      ],
+    },
+    {
+      title: 'Feedback Metrics',
+      items: [
+        'Satisfaction score',
+        'Comment analysis',
+      ],
+    },
+    {
+      title: 'Engagement Metrics',
+      items: [
+        'Time spent',
+        'Click rate: interaction with tutorial',
+        'Idle time',
+        'Self rating',
+        'Learning pattern',
+      ],
+    },
+    {
+      title: 'Performance Metrics',
+      items: [
+        'Quiz scores',
+        'Pass/fail rate',
+        'Error frequency',
+        'Safety violations',
+        'Hints',
+      ],
+    },
+    {
+      title: 'Quality and Error',
+      items: [
+        'Total time taken',
+        'Time spent per step',
+        'Time spent reading instructions',
+        'Time spent executing',
+        'Number of attempts before perfect run',
+        'Post-training failure rate',
+        'Trainer',
+        'Trainer-to-student ratio',
+        'Physical interventions',
+      ],
+    },
+    {
+      title: 'LLM Generated Description',
+      items: [
+        'Narrative summary of trainee performance, auto-generated once available',
+      ],
+    },
+    {
+      title: 'Competency Matrix',
+      items: [
+        'Skill-by-skill competency breakdown',
+      ],
+    },
+  ]);
 
   constructor(
     private route: ActivatedRoute,

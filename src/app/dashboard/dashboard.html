@@ -53,10 +53,14 @@
         <span>Training</span>
       </button>
 
-      <button class="nav-item">
+      <a 
+        routerLink="/dashboard/analytics" 
+        routerLinkActive="active" 
+        class="nav-item"
+      >
         <svg [lucideIcon]="chartBarIcon" [size]="20" class="nav-icon"></svg>
-        <span>Reports</span>
-      </button>
+        <span>Analytics</span>
+    </a>
 
     </nav>
 
