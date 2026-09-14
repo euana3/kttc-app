@@ -7,7 +7,23 @@
       <h2>Active Sessions</h2>
       <p>Devices and browsers currently signed in to your account.</p>
     </div>
-    <p class="placeholder-note">Coming soon.</p>
+
+    <div class="demo-banner">
+      <span class="demo-badge">Demo data</span>
+      This is stored only in this browser (localStorage) — not a real server-tracked session, since the backend has no authentication yet.
+    </div>
+
+    @if (currentSessionStart) {
+      <div class="session-row">
+        <div class="session-info">
+          <span class="session-device">This browser</span>
+          <span class="session-detail">Session started {{ formatTimestamp(currentSessionStart) }}</span>
+        </div>
+        <span class="session-status">Active</span>
+      </div>
+    } @else {
+      <p class="placeholder-note">No session recorded yet.</p>
+    }
   </div>
 
   <div class="settings-card">
@@ -15,7 +31,26 @@
       <h2>Login History</h2>
       <p>Recent sign-in activity for your account.</p>
     </div>
-    <p class="placeholder-note">Coming soon.</p>
+
+    <div class="demo-banner">
+      <span class="demo-badge">Demo data</span>
+      Local to this browser only — clears if you clear site data, and isn't visible from any other device.
+    </div>
+
+    @if (loginHistory.length === 0) {
+      <p class="placeholder-note">No login history recorded yet.</p>
+    } @else {
+      <div class="login-history-list">
+        @for (event of loginHistory; track event.timestamp) {
+          <div class="login-row">
+            <span class="login-time">{{ formatTimestamp(event.timestamp) }}</span>
+            <span class="login-user">{{ event.user ?? 'Unknown user' }}</span>
+          </div>
+        }
+      </div>
+
+      <button type="button" class="btn-clear" (click)="clearHistory()">Clear local history</button>
+    }
   </div>
 
 </div>

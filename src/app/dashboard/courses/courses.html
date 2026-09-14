@@ -23,7 +23,46 @@
         <div class="course-card">
           <div class="course-main">
             <h3>{{ course.name }}</h3>
-            <p>{{ course.description }}</p>
+
+            @if (editingCourseId() === course.id) {
+              <div class="description-edit">
+                <textarea
+                  rows="3"
+                  [ngModel]="editingDescription()"
+                  (ngModelChange)="editingDescription.set($event)"
+                  [disabled]="savingDescription()"
+                  placeholder="What this course covers"
+                ></textarea>
+
+                @if (descriptionError()) {
+                  <p class="description-error">{{ descriptionError() }}</p>
+                }
+
+                <div class="description-actions">
+                  <button
+                    type="button"
+                    class="btn-cancel-sm"
+                    (click)="cancelEditingDescription()"
+                    [disabled]="savingDescription()"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    class="btn-save-sm"
+                    (click)="saveDescription(course.id)"
+                    [disabled]="savingDescription()"
+                  >
+                    {{ savingDescription() ? 'Saving...' : 'Save' }}
+                  </button>
+                </div>
+              </div>
+            } @else {
+              <p class="course-description">
+                {{ course.description || 'No description yet.' }}
+                <button type="button" class="edit-link" (click)="startEditingDescription(course)">Edit</button>
+              </p>
+            }
           </div>
 
           <div class="course-meta">

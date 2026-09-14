@@ -89,6 +89,11 @@
   border-color: rgba(77, 171, 247, 0.35);
 }
 
+.course-main {
+  flex: 1;
+  min-width: 0;
+}
+
 .course-main h3 {
   margin: 0 0 4px;
   font-size: 15px;
@@ -96,11 +101,103 @@
   color: #e6edf7;
 }
 
-.course-main p {
+.course-description {
   margin: 0;
   font-size: 12px;
   color: #8b98b8;
   line-height: 1.4;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.edit-link {
+  background: none;
+  border: none;
+  color: #74c0fc;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.edit-link:hover {
+  text-decoration: underline;
+}
+
+.description-edit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 480px;
+}
+
+.description-edit textarea {
+  width: 100%;
+  padding: 8px 10px;
+  background: rgba(5, 12, 24, 0.7);
+  border: 1px solid rgba(77, 171, 247, 0.4);
+  border-radius: 6px;
+  color: #e6edf7;
+  font-size: 12px;
+  box-sizing: border-box;
+  outline: none;
+  resize: vertical;
+}
+
+.description-edit textarea:disabled {
+  opacity: 0.6;
+}
+
+.description-error {
+  margin: 0;
+  color: #ff6b81;
+  font-size: 11px;
+}
+
+.description-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-cancel-sm,
+.btn-save-sm {
+  height: 28px;
+  padding: 0 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-cancel-sm {
+  background: transparent;
+  color: #8b98b8;
+  border: 1px solid rgba(139, 152, 184, 0.2);
+}
+
+.btn-cancel-sm:hover:not(:disabled) {
+  color: #e6edf7;
+  border-color: rgba(139, 152, 184, 0.35);
+}
+
+.btn-save-sm {
+  background: #4dabf7;
+  color: #051016;
+  border: none;
+}
+
+.btn-save-sm:hover:not(:disabled) {
+  background: #74c0fc;
+}
+
+.btn-cancel-sm:disabled,
+.btn-save-sm:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .course-meta {

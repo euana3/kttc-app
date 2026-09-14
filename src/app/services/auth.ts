@@ -2,20 +2,31 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, of, throwError } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { environment } from '../environment/environment';
 import { delay } from 'rxjs/operators';
+import { SessionLogService } from './session-log';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
 
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+    private sessionLog: SessionLogService,
+  ) { }
 
   // Login function that sends username and password to the backend and handles response
   loginWithUsername(username: string, password: string): Observable<any> {
     const payload = { username, password }
-    return this.http.post(`${environment.baseUrl}/login`, payload);
+    return this.http.post(`${environment.baseUrl}/login`, payload).pipe(
+      // Demo-only local login log — see SessionLogService for caveats.
+      // Fires on any successful (2xx) response; failed logins go through the
+      // error channel instead and are not recorded here.
+      tap(() => this.sessionLog.recordLogin(username))
+    );
   }
 
   // ====================== Permission Handling ======================
