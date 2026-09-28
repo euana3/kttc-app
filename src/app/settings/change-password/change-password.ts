@@ -72,7 +72,7 @@ export class ChangePassword {
 
     const userId = sessionStorage.getItem('userId');
     const username = sessionStorage.getItem('username');
-    const { newPassword } = this.passwordForm.value;
+    const { currentPassword, newPassword } = this.passwordForm.value;
 
     if (!userId || !username) {
       this.statusMessage.set('Session expired. Please log in again.');
@@ -84,7 +84,23 @@ export class ChangePassword {
     this.submitStatus.set('loading');
     this.statusMessage.set('');
 
-    this.http.post<any>(`${environment.apiUrl}/login/update`, {
+    // Step 1: verify the current password. Note: baseUrl, not apiUrl —
+    // /login is mounted at the root in server.mjs, not under /api.
+    this.http.post<any>(`${environment.baseUrl}/login`, {
+      username,
+      password: currentPassword,
+    }).subscribe({
+      next: () => this.performPasswordUpdate(userId, username, newPassword),
+      error: () => {
+        this.submitStatus.set('error');
+        this.statusMessage.set('Current password is incorrect.');
+        this.autoResetStatus();
+      },
+    });
+}
+
+private performPasswordUpdate(userId: string, username: string, newPassword: string): void {
+    this.http.post<any>(`${environment.baseUrl}/login/update`, {
       id: userId,
       username,
       password: newPassword,
@@ -101,7 +117,7 @@ export class ChangePassword {
         this.autoResetStatus();
       },
     });
-  }
+}
 
   // Hides the bar and message a few seconds after resolving, so it doesn't linger forever.
   private autoResetStatus(): void {
