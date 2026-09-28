@@ -1,8 +1,8 @@
-import { Component, ElementRef, OnDestroy, OnInit, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, effect, OnDestroy, OnInit, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TraineesService, TraineeBatchDetail } from '../../../services/trainees';
 import { AttemptsService } from '../../../services/attempts';
-
+import { environment } from '../../../environment/environment';
 interface PlannedMetricCategory {
   title: string;
   items: string[];
@@ -99,7 +99,15 @@ export class TraineeDetail implements OnInit, OnDestroy {
     private router: Router,
     private traineesService: TraineesService,
     private attemptsService: AttemptsService,
-  ) {}
+  ) {
+    effect((onCleanup) => {
+      const canvasRef = this.streamCanvas();
+      if (!canvasRef) return;
+
+      const stop = this.startVideoStream(canvasRef.nativeElement);
+      onCleanup(stop);
+    });
+  }
 
   ngOnInit(): void {
     this.batchId = Number(this.route.snapshot.paramMap.get('batchId'));
@@ -154,6 +162,54 @@ export class TraineeDetail implements OnInit, OnDestroy {
 
     this.liveSocket.onerror = (err) => {
       console.error('Live event socket error', err);
+    };
+  }
+
+   private startVideoStream(canvas: HTMLCanvasElement): () => void {
+    const ctx = canvas.getContext('2d');
+    let ws: WebSocket | null = null;
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
+    let stopped = false;
+    let decoding = false;
+
+    const connect = () => {
+      ws = new WebSocket(environment.streamUrl);
+      ws.binaryType = 'blob';
+
+      ws.onmessage = async (event) => {
+        if (decoding || !ctx) return;
+        decoding = true;
+        try {
+          const bitmap = await createImageBitmap(event.data as Blob);
+          if (canvas.width !== bitmap.width || canvas.height !== bitmap.height) {
+            canvas.width = bitmap.width;
+            canvas.height = bitmap.height;
+          }
+          ctx.drawImage(bitmap, 0, 0);
+          bitmap.close();
+
+          if (!this.streamConnected()) this.streamConnected.set(true);
+        } catch (err) {
+          console.warn('Could not decode video frame', err);
+        } finally {
+          decoding = false;
+        }
+      };
+
+      ws.onerror = () => ws?.close();
+
+      ws.onclose = () => {
+        this.streamConnected.set(false);
+        if (!stopped) retryTimer = setTimeout(connect, 2000);
+      };
+    };
+
+    connect();
+
+    return () => {
+      stopped = true;
+      clearTimeout(retryTimer);
+      ws?.close();
     };
   }
 

@@ -3,5 +3,7 @@ export const environment = {
     // apiUrl: 'http://192.168.11.232:3000'
 
     baseUrl: 'http://localhost:3000',
-    apiUrl: 'http://localhost:3000/api'
+    apiUrl: 'http://localhost:3000/api',
+    streamUrl: 'ws://localhost:3001',   // new: the Python video server
+
 }
