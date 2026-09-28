@@ -5,3 +5,100 @@
   label { display: block; font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-bottom: 2px; }
   p { margin: 0; color: var(--color-text-primary); font-size: var(--font-size-md); }
 }
+
+
+/* ===================================== */
+/* LAYOUT                                */
+/* ===================================== */
+
+.account-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;               // space between the two boxes
+  align-items: start;
+
+  > .settings-card {
+    margin: 0;
+    min-width: 0;          // lets long text wrap instead of pushing the card wider
+  }
+}
+
+/* ===================================== */
+/* ACCOUNT                               */
+/* ===================================== */
+
+.profile-field {
+  margin-bottom: 14px;
+  label { display: block; font-size: var(--font-size-sm); color: var(--color-text-secondary); margin-bottom: 2px; }
+  p { margin: 0; color: var(--color-text-primary); font-size: var(--font-size-md); }
+}
+
+/* ===================================== */
+/* CERTIFICATIONS                        */
+/* ===================================== */
+
+.cert-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cert-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: rgba(5, 12, 24, 0.45);
+  border-left: 3px solid #51cf66;
+
+  &.soon      { border-left-color: #ff922b; }
+  &.expired   { border-left-color: #ff6b81; }
+  &.permanent { border-left-color: #4dabf7; }
+}
+
+.cert-main {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  strong { font-size: 13px; color: var(--color-text-primary); }
+}
+
+.cert-issuer { font-size: 12px; color: #74c0fc; }
+.cert-meta { font-size: 11px; color: var(--color-text-secondary); }
+
+.cert-expiry {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+
+  small { font-size: 11px; color: var(--color-text-secondary); }
+}
+
+.cert-badge {
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &.valid     { background: rgba(81, 207, 102, 0.12); color: #51cf66; }
+  &.soon      { background: rgba(255, 146, 43, 0.12); color: #ff922b; }
+  &.expired   { background: rgba(255, 77, 109, 0.12); color: #ff6b81; }
+  &.permanent { background: rgba(77, 171, 247, 0.12); color: #4dabf7; }
+}
+
+/* ===================================== */
+/* RESPONSIVE                            */
+/* ===================================== */
+
+@media (max-width: 900px) {
+  .account-layout { grid-template-columns: 1fr; }
+}

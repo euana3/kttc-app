@@ -1,18 +1,52 @@
-<div class="settings-card">
-  <div class="card-header">
-    <h2>Account</h2>
-    <p>Your basic profile information.</p>
+<div class="account-layout">
+
+  <!-- ===================== ACCOUNT CARD ===================== -->
+  <div class="settings-card">
+    <div class="card-header">
+      <h2>Account</h2>
+      <p>Your basic profile information.</p>
+    </div>
+
+    <div class="profile-field">
+      <label>Full Name</label>
+      <p>{{ fullname() || '—' }}</p>
+    </div>
+
+    <div class="profile-field">
+      <label>Username</label>
+      <p>{{ username() || '—' }}</p>
+    </div>
   </div>
 
-  <div class="profile-field">
-    <label>Full Name</label>
-    <p>{{ fullname() || '—' }}</p>
+  <!-- ===================== CERTIFICATIONS CARD ===================== -->
+  <div class="settings-card">
+    <div class="card-header">
+      <h2>Certifications</h2>
+      <p>Licences and training for heavy vehicle inspection.</p>
+    </div>
+
+    <ul class="cert-list">
+      @for (cert of certs(); track cert.certNo) {
+        <li class="cert-item" [class]="cert.status">
+          <div class="cert-main">
+            <strong>{{ cert.name }}</strong>
+            <span class="cert-issuer">{{ cert.issuer }}</span>
+            <span class="cert-meta">
+              No. {{ cert.certNo }} · Issued {{ cert.issued | date: 'dd MMM yyyy' }}
+            </span>
+          </div>
+
+          <div class="cert-expiry">
+            <span class="cert-badge" [class]="cert.status">{{ statusLabel(cert.status, cert.daysLeft) }}</span>
+            @if (cert.expiry) {
+              <small>Expiry: {{ cert.expiry | date: 'dd MMM yyyy' }}</small>
+            } @else {
+              <small>Does not expire</small>
+            }
+          </div>
+        </li>
+      }
+    </ul>
   </div>
 
-  <div class="profile-field">
-    <label>Username</label>
-    <p>{{ username() || '—' }}</p>
-  </div>
-
-  <p class="placeholder-note">Editing profile details, email and avatar upload coming soon.</p>
 </div>
