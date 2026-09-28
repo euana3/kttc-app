@@ -1,8 +1,11 @@
-import { Component, ElementRef, effect, OnDestroy, OnInit, signal, viewChild } from '@angular/core';
+import { Component, ElementRef, computed, effect, OnDestroy, OnInit, signal, viewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TraineesService, TraineeBatchDetail } from '../../../services/trainees';
 import { AttemptsService } from '../../../services/attempts';
 import { environment } from '../../../environment/environment';
+
+type StreamState = 'connecting' | 'connected' | 'disconnected';
+
 interface PlannedMetricCategory {
   title: string;
   items: string[];
@@ -23,8 +26,19 @@ export class TraineeDetail implements OnInit, OnDestroy {
   protected batchId!: number;
   protected traineeId!: number;
 
+  // ── Live video stream ────────────────────────────────────────────────────
   protected readonly streamCanvas = viewChild<ElementRef<HTMLCanvasElement>>('streamCanvas');
-  protected readonly streamConnected = signal(false);
+
+  protected readonly streamState = signal<StreamState>('connecting');
+  protected readonly streamConnected = computed(() => this.streamState() === 'connected');
+
+  protected readonly streamStateLabel = computed(() => {
+    switch (this.streamState()) {
+      case 'connected': return 'Connected';
+      case 'connecting': return 'Connecting…';
+      default: return 'Not connected';
+    }
+  });
 
   private liveSocket: WebSocket | null = null;
 
@@ -100,18 +114,33 @@ export class TraineeDetail implements OnInit, OnDestroy {
     private traineesService: TraineesService,
     private attemptsService: AttemptsService,
   ) {
+    // The canvas only exists after the detail loads AND the live block renders,
+    // so we react to the viewChild signal instead of connecting in ngOnInit.
     effect((onCleanup) => {
       const canvasRef = this.streamCanvas();
       if (!canvasRef) return;
 
       const stop = this.startVideoStream(canvasRef.nativeElement);
-      onCleanup(stop);
+      onCleanup(stop); // closes the socket when the canvas disappears or the component is destroyed
     });
   }
 
   ngOnInit(): void {
     this.batchId = Number(this.route.snapshot.paramMap.get('batchId'));
     this.traineeId = Number(this.route.snapshot.paramMap.get('traineeId'));
+
+    // ── TEMPORARY MOCK (for testing the video without the backend) ──────────
+    // To use it: comment out the whole getBatchDetail(...) block below and
+    // uncomment these lines. Reverse this when your backend is available.
+    //
+    // this.detail.set({
+    //   trainee: { id: 1, name: 'Trainee 1' },
+    //   overall_stats: { avg_time_per_session: '18 min' },
+    //   learning_path: [],
+    //   live_event_log: { attempt_id: 1, events: [] },
+    // } as any);
+    // this.loading.set(false);
+    // return;
 
     this.traineesService.getBatchDetail(this.traineeId, this.batchId).subscribe({
       next: (detail) => {
@@ -132,6 +161,7 @@ export class TraineeDetail implements OnInit, OnDestroy {
     this.liveSocket?.close();
   }
 
+  // Event-log socket (JSON messages from the Fastify backend)
   private connectLiveSocket(attemptId: number): void {
     this.liveSocket = this.attemptsService.connectLive(attemptId);
 
@@ -165,7 +195,8 @@ export class TraineeDetail implements OnInit, OnDestroy {
     };
   }
 
-   private startVideoStream(canvas: HTMLCanvasElement): () => void {
+  // Video socket (binary JPEG frames from the Python server)
+  private startVideoStream(canvas: HTMLCanvasElement): () => void {
     const ctx = canvas.getContext('2d');
     let ws: WebSocket | null = null;
     let retryTimer: ReturnType<typeof setTimeout> | undefined;
@@ -173,10 +204,13 @@ export class TraineeDetail implements OnInit, OnDestroy {
     let decoding = false;
 
     const connect = () => {
+      this.streamState.set('connecting');            // yellow
       ws = new WebSocket(environment.streamUrl);
-      ws.binaryType = 'blob';
+      ws.binaryType = 'blob';                        // each message is one JPEG
 
       ws.onmessage = async (event) => {
+        // Drop frames that arrive while the previous one is still decoding,
+        // so the picture never falls behind real time.
         if (decoding || !ctx) return;
         decoding = true;
         try {
@@ -188,7 +222,7 @@ export class TraineeDetail implements OnInit, OnDestroy {
           ctx.drawImage(bitmap, 0, 0);
           bitmap.close();
 
-          if (!this.streamConnected()) this.streamConnected.set(true);
+          if (this.streamState() !== 'connected') this.streamState.set('connected');   // green
         } catch (err) {
           console.warn('Could not decode video frame', err);
         } finally {
@@ -199,13 +233,15 @@ export class TraineeDetail implements OnInit, OnDestroy {
       ws.onerror = () => ws?.close();
 
       ws.onclose = () => {
-        this.streamConnected.set(false);
-        if (!stopped) retryTimer = setTimeout(connect, 2000);
+        if (stopped) return;
+        this.streamState.set('disconnected');        // red
+        retryTimer = setTimeout(connect, 2000);      // goes back to yellow when it retries
       };
     };
 
     connect();
 
+    // Cleanup function returned to the effect
     return () => {
       stopped = true;
       clearTimeout(retryTimer);

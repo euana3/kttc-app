@@ -72,11 +72,17 @@
       <div class="live-columns">
 
         <div class="stream-panel">
-          <span class="panel-label">LIVE VIDEO FEED</span>
+          <div class="panel-header-row">
+            <span class="panel-label">LIVE VIDEO FEED</span>
+            <span class="stream-status">
+              <span class="stream-light" [class]="streamState()"></span>
+              {{ streamStateLabel() }}
+            </span>
+          </div>
 
           <div class="stream-frame">
             <canvas #streamCanvas class="stream-canvas"></canvas>
-            
+
             @if (!streamConnected()) {
               <div class="stream-placeholder">
                 <div class="stream-dots">
