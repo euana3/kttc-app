@@ -1,174 +1,177 @@
-import { Component, OnInit, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, signal, computed } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import {
   LucideDynamicIcon,
   LucideGraduationCap,
+  LucideCheckCircle,
+  LucideTriangleAlert,
+  LucideAward,
+  LucideBarChart3,
+  LucideLayers,
+  LucideTarget,
+  LucideClock,
   LucideUsers,
   LucideBookOpen,
   LucideCalendar,
-  LucideChartBar,
-  LucideSettings,
-  LucideBot,
   LucideBell,
-  LucideCheck,
-  LucideLightbulb,
-  LucideTriangleAlert,
-  LucideCircleAlert,
-  LucideInfo,
+  LucideSearch,
 } from '@lucide/angular';
-import { AnalyticsService, DashboardOverview } from '../../services/analytics';
-import { BatchesService } from '../../services/batches';
-import { CopilotWidgetService } from '../../services/copilot-widget';
+import { BatchesService, BatchDetail, BatchWithCourseName } from '../../services/batches';
 
 type IconType =
-  | typeof LucideGraduationCap
-  | typeof LucideUsers
-  | typeof LucideBookOpen
-  | typeof LucideCalendar
-  | typeof LucideChartBar
-  | typeof LucideSettings
-  | typeof LucideBot
-  | typeof LucideBell
-  | typeof LucideCheck
-  | typeof LucideLightbulb
-  | typeof LucideTriangleAlert
-  | typeof LucideCircleAlert
-  | typeof LucideInfo;
+  | typeof LucideGraduationCap | typeof LucideCheckCircle | typeof LucideTriangleAlert
+  | typeof LucideAward | typeof LucideBarChart3 | typeof LucideLayers
+  | typeof LucideTarget | typeof LucideClock | typeof LucideUsers | typeof LucideBookOpen
+  | typeof LucideCalendar | typeof LucideBell | typeof LucideSearch;
 
-interface DashboardCard {
-  title: string;
-  description: string;
-  icon: IconType;
-  color: string;
-  route?: string;
-  action?: 'navigate' | 'open-copilot';
-  enabled: boolean;
+interface ModuleProgress {
+  id: number;
+  name: string;
+  avg_progress: number;
 }
+
+interface RosterTrainee {
+  id: number;
+  name: string;
+  progress: number;
+  status: 'live' | 'attention' | 'ok';
+}
+
+type RiskFilter = 'all' | 'attention' | 'ok';
 
 @Component({
   selector: 'app-dashboard-home',
   standalone: true,
-  imports: [LucideDynamicIcon],
+  imports: [LucideDynamicIcon, FormsModule],
   templateUrl: './dashboard-home.html',
   styleUrl: './dashboard-home.scss'
 })
 export class DashboardHome implements OnInit {
 
   protected readonly graduationCapIcon: IconType = LucideGraduationCap;
-  protected readonly calendarIcon: IconType = LucideCalendar;
-  protected readonly chartBarIcon: IconType = LucideChartBar;
-  protected readonly checkIcon: IconType = LucideCheck;
+  protected readonly checkCircleIcon: IconType = LucideCheckCircle;
+  protected readonly alertIcon: IconType = LucideTriangleAlert;
+  protected readonly awardIcon: IconType = LucideAward;
+  protected readonly barChartIcon: IconType = LucideBarChart3;
+  protected readonly layersIcon: IconType = LucideLayers;
+  protected readonly targetIcon: IconType = LucideTarget;
+  protected readonly clockIcon: IconType = LucideClock;
+  protected readonly usersIcon: IconType = LucideUsers;
   protected readonly bookOpenIcon: IconType = LucideBookOpen;
-  protected readonly lightbulbIcon: IconType = LucideLightbulb;
-  protected readonly triangleAlertIcon: IconType = LucideTriangleAlert;
-  protected readonly circleAlertIcon: IconType = LucideCircleAlert;
-  protected readonly infoIcon: IconType = LucideInfo;
+  protected readonly calendarIcon: IconType = LucideCalendar;
+  protected readonly bellIcon: IconType = LucideBell;
+  protected readonly searchIcon: IconType = LucideSearch;
 
-  protected readonly dashboardCards = signal<DashboardCard[]>([
-    {
-      title: 'Trainee Dashboard',
-      description: 'View your courses, progress, assessments and upcoming training.',
-      icon: LucideGraduationCap,
-      color: 'blue',
-      route: '/dashboard/trainees',
-      action: 'navigate',
-      enabled: true
-    },
-    {
-      title: 'Trainer Dashboard',
-      description: 'Manage training sessions, trainees, attendance and assessments.',
-      icon: LucideUsers,
-      color: 'purple',
-      route: '/trainer',
-      action: 'navigate',
-      enabled: true
-    },
-    {
-      title: 'Copilot',
-      description: 'Ask questions and retrieve training information using natural language.',
-      icon: LucideBot,
-      color: 'cyan',
-      action: 'open-copilot',
-      enabled: true
-    },
-    {
-      title: 'Alerts',
-      description: 'View important training, course and user notifications.',
-      icon: LucideBell,
-      color: 'orange',
-      route: '/alerts',
-      action: 'navigate',
-      enabled: true
-    },
-    {
-      title: 'Recommendations',
-      description: 'Get personalized training and learning recommendations.',
-      icon: LucideLightbulb,
-      color: 'green',
-      route: '/recommendations',
-      action: 'navigate',
-      enabled: true
-    },
-    {
-      title: 'Analytics',
-      description: 'Analyze training performance, completion and assessment results.',
-      icon: LucideChartBar,
-      color: 'pink',
-      route: '/dashboard/analytics',
-      action: 'navigate',
-      enabled: true
-    },
-    {
-      title: 'Course Optimization',
-      description: 'Analyze and optimize courses using training performance data.',
-      icon: LucideSettings,
-      color: 'yellow',
-      route: '/course-optimization',
-      action: 'navigate',
-      enabled: true
-    }
-  ]);
+  // ── Batch selector ──────────────────────────────────────────────────────
+  protected readonly batches = signal<BatchWithCourseName[]>([]);
+  protected readonly selectedBatchId = signal<number | null>(null);
+  protected readonly loadingBatches = signal(true);
 
-  // ── Top summary stats ──────────────────────────────────────────────────
-  protected readonly overview = signal<DashboardOverview | null>(null);
-  protected readonly upcomingBatchCount = signal<number | null>(null);
-  protected readonly summaryLoading = signal(true);
+  // ── Real data: funnel + roster (scoped to selected batch) ───────────────
+  protected readonly modules = signal<ModuleProgress[]>([]);
+  protected readonly roster = signal<RosterTrainee[]>([]);
+  protected readonly loadingDetail = signal(true);
+  protected readonly loadError = signal('');
 
-  constructor(
-    private router: Router,
-    private analyticsService: AnalyticsService,
-    private batchesService: BatchesService,
-    private copilotService: CopilotWidgetService,
-  ) {}
+  // ── Roster filtering ──────────────────────────────────────────────────
+  protected readonly searchTerm = signal('');
+  protected readonly riskFilter = signal<RiskFilter>('all');
+
+  protected readonly filteredRoster = computed(() => {
+    const term = this.searchTerm().trim().toLowerCase();
+    const risk = this.riskFilter();
+    return this.roster().filter(t => {
+      const matchesTerm = !term || t.name.toLowerCase().includes(term);
+      const matchesRisk = risk === 'all' || t.status === risk;
+      return matchesTerm && matchesRisk;
+    });
+  });
+
+  protected readonly atRiskCount = computed(() =>
+    this.roster().filter(t => t.status === 'attention').length
+  );
+
+  protected readonly avgModuleCompletion = computed(() => {
+    const mods = this.modules();
+    if (!mods.length) return null;
+    return Math.round(mods.reduce((sum, m) => sum + m.avg_progress, 0) / mods.length);
+  });
+
+  constructor(private batchesService: BatchesService) {}
 
   ngOnInit(): void {
-    this.analyticsService.getDashboard().subscribe({
-      next: (overview) => {
-        this.overview.set(overview);
-        this.summaryLoading.set(false);
+    // Lists every batch for the selector. If your BatchesService.getAll()
+    // requires a status argument, call it as getAll(undefined) instead.
+    this.batchesService.getAll().subscribe({
+      next: (batches) => {
+        this.batches.set(batches);
+        this.loadingBatches.set(false);
+        if (batches.length) {
+          this.selectedBatchId.set(batches[0].id);
+          this.loadBatch(batches[0].id);
+        } else {
+          this.loadingDetail.set(false);
+        }
       },
-      error: (err) => {
-        console.error('Failed to load dashboard overview', err);
-        this.summaryLoading.set(false);
-      },
-    });
-
-    this.batchesService.getAll('upcoming').subscribe({
-      next: (batches) => this.upcomingBatchCount.set(batches.length),
-      error: (err) => {
-        console.error('Failed to load upcoming batches', err);
-        this.upcomingBatchCount.set(null);
+      error: () => {
+        this.loadingBatches.set(false);
+        this.loadingDetail.set(false);
+        this.loadError.set('Could not load batches.');
       },
     });
   }
 
-  protected handleCardClick(card: DashboardCard): void {
-    if (card.action === 'open-copilot') {
-      if (!this.copilotService.open()) this.copilotService.toggle();
-      return;
-    }
-    if (card.route) {
-      this.router.navigate([card.route]);
-    }
+  protected onBatchChange(id: number): void {
+    this.selectedBatchId.set(id);
+    this.loadBatch(id);
+  }
+
+  private loadBatch(id: number): void {
+    this.loadingDetail.set(true);
+    this.loadError.set('');
+
+    // BatchesService.getById() remaps the raw backend shape into
+    // module_progress[] / trainee_progress[] for batch-detail.html, so we
+    // translate it back into the flatter shape this dashboard renders.
+    this.batchesService.getById(id).subscribe({
+      next: (detail: BatchDetail) => {
+        this.modules.set(
+          detail.module_progress.map(m => ({
+            id: m.module_id,
+            name: m.module_name,
+            avg_progress: m.average_progress_percent,
+          }))
+        );
+        this.roster.set(
+          detail.trainee_progress.map(t => ({
+            id: t.trainee.id,
+            name: t.trainee.name,
+            progress: t.progress_percent,
+            status: t.status,
+          }))
+        );
+        this.loadingDetail.set(false);
+      },
+      error: () => {
+        this.loadingDetail.set(false);
+        this.loadError.set('Could not load batch detail.');
+      },
+    });
+  }
+
+  protected isLive(status: string): boolean {
+    return status === 'live';
+  }
+
+  protected riskLabel(status: string): string {
+    if (status === 'live') return 'Unknown'; // backend doesn't compute risk for live trainees
+    if (status === 'attention') return 'High Risk';
+    return 'Low Risk';
+  }
+
+  protected riskClass(status: string): string {
+    if (status === 'live') return 'unknown';
+    if (status === 'attention') return 'high';
+    return 'low';
   }
 }

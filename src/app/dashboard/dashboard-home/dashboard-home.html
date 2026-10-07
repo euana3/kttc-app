@@ -1,146 +1,247 @@
-<section class="dashboard-summary">
+<div class="trainer-page">
 
-  <div class="summary-card">
-    <span class="summary-icon blue">
-      <svg [lucideIcon]="graduationCapIcon" [size]="20"></svg>
-    </span>
-    <div>
-      <span class="summary-label">Active Courses</span>
-      <strong>{{ summaryLoading() ? '—' : overview()?.active_courses ?? '—' }}</strong>
+  <!-- ===================== HEADER ===================== -->
+  <header class="trainer-header">
+    <div class="trainer-header-title">
+      <svg [lucideIcon]="graduationCapIcon" [size]="18"></svg>
+      <span class="eyebrow">LMS TRAINER WORKSPACE</span>
     </div>
-  </div>
+    <div class="trainer-header-row">
+      <h1>Trainer Command Center</h1>
 
-  <div class="summary-card">
-    <span class="summary-icon green">
-      <svg [lucideIcon]="checkIcon" [size]="20"></svg>
-    </span>
-    <div>
-      <span class="summary-label">Completed Courses</span>
-      <strong>{{ summaryLoading() ? '—' : overview()?.completed_total ?? '—' }}</strong>
+      <div class="trainer-header-actions">
+        <select
+          class="batch-select"
+          [ngModel]="selectedBatchId()"
+          (ngModelChange)="onBatchChange($event)"
+          [disabled]="loadingBatches() || batches().length === 0"
+        >
+          @for (b of batches(); track b.id) {
+            <option [value]="b.id">{{ b.course_name }} / {{ b.name }}</option>
+          }
+        </select>
+
+        <button class="icon-button" title="Notifications">
+          <svg [lucideIcon]="bellIcon" [size]="18"></svg>
+        </button>
+      </div>
     </div>
-  </div>
+  </header>
 
-  <div class="summary-card">
-    <span class="summary-icon orange">
-      <svg [lucideIcon]="calendarIcon" [size]="20"></svg>
-    </span>
-    <div>
-      <span class="summary-label">Upcoming Batches</span>
-      <strong>{{ upcomingBatchCount() ?? '—' }}</strong>
-    </div>
-  </div>
-
-  <div class="summary-card">
-    <span class="summary-icon purple">
-      <svg [lucideIcon]="chartBarIcon" [size]="20"></svg>
-    </span>
-    <div>
-      <span class="summary-label">Overall Progress (Score)</span>
-      <strong>{{ summaryLoading() ? '—' : overview()?.avg_score ?? '—' }}</strong>
-    </div>
-  </div>
-
-</section>
-
-
-<section class="section-header">
-  <div>
-    <h2>Training Management</h2>
-    <p>Access your training tools and insights.</p>
-  </div>
-</section>
-
-<section class="feature-grid">
-  @for (card of dashboardCards(); track card.title) {
-    @if (card.enabled) {
-      <article class="feature-card" [class]="card.color" (click)="handleCardClick(card)">
-        <div class="feature-icon">
-          <svg [lucideIcon]="card.icon" [size]="28"></svg>
-        </div>
-        <div class="feature-content">
-          <h3>{{ card.title }}</h3>
-          <p>{{ card.description }}</p>
-        </div>
-        <span class="feature-arrow">→</span>
-      </article>
-    }
+  @if (loadError()) {
+    <p class="error-text">{{ loadError() }}</p>
   }
-</section>
 
-<section class="dashboard-columns">
-
-  <div class="dashboard-panel">
-    <div class="panel-header">
+  <!-- ===================== SUMMARY CARDS ===================== -->
+  <section class="summary-grid">
+    <div class="summary-card">
+      <span class="summary-icon blue"><svg [lucideIcon]="usersIcon" [size]="18"></svg></span>
       <div>
-        <h3>Alerts</h3>
-        <span>Requires your attention</span>
-      </div>
-      <button class="view-all">View all</button>
-    </div>
-
-    <div class="alert-list">
-      <div class="alert-item warning">
-        <span class="alert-icon">
-          <svg [lucideIcon]="triangleAlertIcon" [size]="18"></svg>
-        </span>
-        <div>
-          <strong>Course deadline approaching</strong>
-          <p>3 trainees have courses due this week.</p>
-        </div>
-      </div>
-
-      <div class="alert-item danger">
-        <span class="alert-icon">
-          <svg [lucideIcon]="circleAlertIcon" [size]="18"></svg>
-        </span>
-        <div>
-          <strong>Assessment results pending</strong>
-          <p>5 assessments require review.</p>
-        </div>
-      </div>
-
-      <div class="alert-item info">
-        <span class="alert-icon">
-          <svg [lucideIcon]="infoIcon" [size]="18"></svg>
-        </span>
-        <div>
-          <strong>New training material</strong>
-          <p>New course material is available.</p>
-        </div>
+        <span class="summary-label">Trainees in Batch</span>
+        <strong>{{ loadingDetail() ? '—' : roster().length }}</strong>
       </div>
     </div>
-  </div>
 
-  <div class="dashboard-panel">
-    <div class="panel-header">
+    <div class="summary-card">
+      <span class="summary-icon green"><svg [lucideIcon]="checkCircleIcon" [size]="18"></svg></span>
       <div>
-        <h3>Recommendations</h3>
-        <span>Based on your activity</span>
-      </div>
-      <button class="view-all">View all</button>
-    </div>
-
-    <div class="recommendation-list">
-      <div class="recommendation-item">
-        <div class="recommendation-icon">
-          <svg [lucideIcon]="lightbulbIcon" [size]="18"></svg>
-        </div>
-        <div>
-          <strong>Advanced Leadership</strong>
-          <p>Recommended based on your completed courses.</p>
-        </div>
-      </div>
-
-      <div class="recommendation-item">
-        <div class="recommendation-icon">
-          <svg [lucideIcon]="bookOpenIcon" [size]="18"></svg>
-        </div>
-        <div>
-          <strong>Data Analysis Fundamentals</strong>
-          <p>Improve your reporting and analytical skills.</p>
-        </div>
+        <span class="summary-label">Avg Module Completion</span>
+        <strong>{{ loadingDetail() ? '—' : (avgModuleCompletion() !== null ? avgModuleCompletion() + '%' : '—') }}</strong>
       </div>
     </div>
-  </div>
 
-</section>
+    <div class="summary-card">
+      <span class="summary-icon orange"><svg [lucideIcon]="alertIcon" [size]="18"></svg></span>
+      <div>
+        <span class="summary-label">At-Risk Trainees</span>
+        <strong>{{ loadingDetail() ? '—' : atRiskCount() }}</strong>
+      </div>
+    </div>
+
+    <div class="summary-card placeholder">
+      <span class="summary-icon purple"><svg [lucideIcon]="awardIcon" [size]="18"></svg></span>
+      <div>
+        <span class="summary-label">Avg Quiz Score <em>(coming soon)</em></span>
+        <strong>—</strong>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CHARTS ROW ===================== -->
+  <section class="charts-grid">
+
+    <!-- REAL: funnel from modules[].avg_progress -->
+    <div class="chart-panel">
+      <div class="panel-title-row">
+        <svg [lucideIcon]="barChartIcon" [size]="16"></svg>
+        <div>
+          <h3>Batch Module Progression & Drop-off Funnel</h3>
+          <p>Average completion per module, this batch</p>
+        </div>
+      </div>
+
+      @if (loadingDetail()) {
+        <p class="empty-text">Loading…</p>
+      } @else if (modules().length === 0) {
+        <p class="empty-text">No modules found for this batch.</p>
+      } @else {
+        <div class="funnel-chart">
+          @for (m of modules(); track m.id) {
+            <div class="funnel-bar-col">
+              <div class="funnel-bar-track">
+                <div class="funnel-bar-fill" [style.height.%]="m.avg_progress"></div>
+              </div>
+              <span class="funnel-bar-value">{{ m.avg_progress }}%</span>
+              <span class="funnel-bar-label">{{ m.name }}</span>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- PLACEHOLDER: no skill-category data in schema -->
+    <div class="chart-panel placeholder-panel">
+      <div class="panel-title-row">
+        <svg [lucideIcon]="layersIcon" [size]="16"></svg>
+        <div>
+          <h3>Cohort Skill Radar <span class="coming-soon-badge">Coming soon</span></h3>
+          <p>Mastery vs target benchmark, by skill area</p>
+        </div>
+      </div>
+      <div class="placeholder-body">
+        <p>Needs a skill-category table (e.g. Frontend, Backend, Database) linked to modules — not yet in the schema.</p>
+      </div>
+    </div>
+
+    <!-- PLACEHOLDER: no attendance tracking -->
+    <div class="chart-panel placeholder-panel">
+      <div class="panel-title-row">
+        <svg [lucideIcon]="targetIcon" [size]="16"></svg>
+        <div>
+          <h3>Engagement vs Quiz Performance <span class="coming-soon-badge">Coming soon</span></h3>
+          <p>Map attendance against scores</p>
+        </div>
+      </div>
+      <div class="placeholder-body">
+        <p>Needs attendance tracking — there's currently no attendance table, only module scores.</p>
+      </div>
+    </div>
+
+    <!-- PLACEHOLDER: avg_time_per_session not aggregated per module -->
+    <div class="chart-panel placeholder-panel">
+      <div class="panel-title-row">
+        <svg [lucideIcon]="clockIcon" [size]="16"></svg>
+        <div>
+          <h3>Module Bottleneck Analysis <span class="coming-soon-badge">Coming soon</span></h3>
+          <p>Avg time spent vs quiz score, per module</p>
+        </div>
+      </div>
+      <div class="placeholder-body">
+        <p>Needs a new endpoint aggregating <code>avg_time_per_session</code> per module across a batch.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ===================== ROSTER + SIDE PANELS ===================== -->
+  <section class="lower-grid">
+
+    <!-- REAL: trainees[] from the batch detail endpoint -->
+    <div class="roster-panel">
+      <div class="roster-header">
+        <div>
+          <h3>Actionable Student Roster</h3>
+          <p>Filter and inspect trainees in this batch</p>
+        </div>
+
+        <div class="roster-controls">
+          <div class="search-box">
+            <svg [lucideIcon]="searchIcon" [size]="14"></svg>
+            <input
+              type="text"
+              placeholder="Search trainee…"
+              [ngModel]="searchTerm()"
+              (ngModelChange)="searchTerm.set($event)"
+            />
+          </div>
+
+          <div class="risk-filter">
+            <button [class.active]="riskFilter() === 'all'" (click)="riskFilter.set('all')">All</button>
+            <button [class.active]="riskFilter() === 'attention'" (click)="riskFilter.set('attention')">High</button>
+            <button [class.active]="riskFilter() === 'ok'" (click)="riskFilter.set('ok')">Low</button>
+          </div>
+        </div>
+      </div>
+
+      @if (loadingDetail()) {
+        <p class="empty-text">Loading roster…</p>
+      } @else if (filteredRoster().length === 0) {
+        <p class="empty-text">No trainees match this filter.</p>
+      } @else {
+        <table class="roster-table">
+          <thead>
+            <tr>
+              <th>Trainee</th>
+              <th>Progress</th>
+              <th>Avg Score <em>(soon)</em></th>
+              <th>Attendance <em>(soon)</em></th>
+              <th>Live</th>
+              <th>Risk</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (t of filteredRoster(); track t.id) {
+              <tr>
+                <td class="trainee-name">{{ t.name }}</td>
+                <td>{{ t.progress }}%</td>
+                <td class="muted">—</td>
+                <td class="muted">—</td>
+                <td>
+                  @if (isLive(t.status)) {
+                    <span class="live-indicator">
+                      <span class="live-dot"></span>
+                      Live
+                    </span>
+                  } @else {
+                    <span class="muted">—</span>
+                  }
+                </td>
+                <td>
+                  <span class="risk-badge" [class]="riskClass(t.status)">{{ riskLabel(t.status) }}</span>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+    <div class="side-panels">
+
+      <!-- PLACEHOLDER: no grading-queue concept -->
+      <div class="side-panel placeholder-panel">
+        <div class="panel-title-row">
+          <svg [lucideIcon]="bookOpenIcon" [size]="16"></svg>
+          <h3>Live Grading Queue <span class="coming-soon-badge">Coming soon</span></h3>
+        </div>
+        <div class="placeholder-body">
+          <p>Needs a "pending review" attempt state — attempts are currently only to_do / in_progress / completed / failed.</p>
+        </div>
+      </div>
+
+      <!-- PLACEHOLDER: no scheduling table -->
+      <div class="side-panel placeholder-panel">
+        <div class="panel-title-row">
+          <svg [lucideIcon]="calendarIcon" [size]="16"></svg>
+          <h3>Upcoming Live Class <span class="coming-soon-badge">Coming soon</span></h3>
+        </div>
+        <div class="placeholder-body">
+          <p>Needs a scheduled-session table (class name, batch, start time, join link).</p>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+</div>
