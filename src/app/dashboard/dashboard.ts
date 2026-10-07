@@ -1,5 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import {
   LucideDynamicIcon,
   LucideHouse,
@@ -11,7 +12,11 @@ import {
   LucideSettings,
   LucideLogOut,
   LucideBell,
+  LucideBot,
+  LucideEraser,
+  LucideChevronDown,
 } from '@lucide/angular';
+import { CopilotWidgetService } from '../services/copilot-widget';
 
 type UserRole = 'Trainee' | 'Trainer' | 'Training Manager' | 'Admin';
 
@@ -24,12 +29,15 @@ type IconType =
   | typeof LucideChartBar
   | typeof LucideSettings
   | typeof LucideLogOut
-  | typeof LucideBell;
+  | typeof LucideBell
+  | typeof LucideBot
+  | typeof LucideEraser
+  | typeof LucideChevronDown;
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, LucideDynamicIcon],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, LucideDynamicIcon, FormsModule],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.scss'
 })
@@ -47,8 +55,11 @@ export class Dashboard implements OnInit {
   protected readonly settingsIcon: IconType = LucideSettings;
   protected readonly logoutIcon: IconType = LucideLogOut;
   protected readonly bellIcon: IconType = LucideBell;
+  protected readonly botIcon: IconType = LucideBot;
+  protected readonly eraserIcon: IconType = LucideEraser;
+  protected readonly chevronDownIcon: IconType = LucideChevronDown;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, protected copilotService: CopilotWidgetService) {}
 
   ngOnInit(): void {
     this.loadUserFromSession();

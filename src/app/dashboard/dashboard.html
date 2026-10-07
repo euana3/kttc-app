@@ -116,4 +116,86 @@
 
   </main>
 
+
+  <!-- =============================== -->
+  <!-- COPILOT WIDGET (persists across all child routes) -->
+  <!-- =============================== -->
+
+  <div class="copilot-widget" [class.open]="copilotService.open()">
+
+    @if (!copilotService.open()) {
+      <button type="button" class="copilot-fab" (click)="copilotService.toggle()">
+        <svg [lucideIcon]="botIcon" [size]="24"></svg>
+      </button>
+    } @else {
+      <div class="copilot-panel">
+
+        <div class="copilot-panel-header">
+          <div class="copilot-panel-title">
+            <svg [lucideIcon]="botIcon" [size]="18"></svg>
+            <span>AI Training Copilot</span>
+          </div>
+          <div class="copilot-panel-actions">
+            @if (copilotService.messages().length > 0) {
+              <button type="button" class="copilot-icon-btn" title="Clear chat" (click)="copilotService.newChat()">
+                <svg [lucideIcon]="eraserIcon" [size]="16"></svg>
+              </button>
+            }
+            <button type="button" class="copilot-icon-btn" title="Minimize" (click)="copilotService.toggle()">
+              <svg [lucideIcon]="chevronDownIcon" [size]="18"></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="copilot-panel-body">
+          @if (copilotService.messages().length === 0) {
+            <p class="copilot-intro">Ask questions about courses, trainees, training schedules, performance or reports using natural language.</p>
+          }
+
+          @if (copilotService.messages().length > 0) {
+            <div class="copilot-transcript">
+              @for (msg of copilotService.messages(); track msg.id) {
+                <div class="copilot-message" [class.assistant]="msg.role === 'assistant'">
+                  <span class="copilot-message-role">{{ msg.role === 'assistant' ? 'Copilot' : 'You' }}</span>
+                  <p>{{ msg.content }}</p>
+                </div>
+              }
+
+              @if (copilotService.sending()) {
+                <div class="copilot-message assistant">
+                  <span class="copilot-message-role">Copilot</span>
+                  <div class="copilot-thinking">
+                    <span class="copilot-dot"></span>
+                    <span class="copilot-dot"></span>
+                    <span class="copilot-dot"></span>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          @if (copilotService.error()) {
+            <p class="copilot-error">{{ copilotService.error() }}</p>
+          }
+        </div>
+
+        <div class="copilot-panel-input">
+          <input
+            type="text"
+            placeholder="Ask Copilot…"
+            [ngModel]="copilotService.draft()"
+            (ngModelChange)="copilotService.draft.set($event)"
+            (keydown.enter)="copilotService.ask()"
+            [disabled]="copilotService.sending()"
+          />
+          <button (click)="copilotService.ask()" [disabled]="copilotService.sending() || !copilotService.draft().trim()">
+            {{ copilotService.sending() ? '…' : 'Send' }}
+          </button>
+        </div>
+
+      </div>
+    }
+
+  </div>
+
 </div>

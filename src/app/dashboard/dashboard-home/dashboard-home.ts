@@ -1,6 +1,5 @@
-import { Component, ElementRef, OnInit, signal, viewChild } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
 import {
   LucideDynamicIcon,
   LucideGraduationCap,
@@ -17,9 +16,9 @@ import {
   LucideCircleAlert,
   LucideInfo,
 } from '@lucide/angular';
-import { ChatService, ChatMessage } from '../../services/chat';
 import { AnalyticsService, DashboardOverview } from '../../services/analytics';
 import { BatchesService } from '../../services/batches';
+import { CopilotWidgetService } from '../../services/copilot-widget';
 
 type IconType =
   | typeof LucideGraduationCap
@@ -42,14 +41,14 @@ interface DashboardCard {
   icon: IconType;
   color: string;
   route?: string;
-  action?: 'navigate' | 'scroll';
+  action?: 'navigate' | 'open-copilot';
   enabled: boolean;
 }
 
 @Component({
   selector: 'app-dashboard-home',
   standalone: true,
-  imports: [LucideDynamicIcon, FormsModule],
+  imports: [LucideDynamicIcon],
   templateUrl: './dashboard-home.html',
   styleUrl: './dashboard-home.scss'
 })
@@ -59,7 +58,6 @@ export class DashboardHome implements OnInit {
   protected readonly calendarIcon: IconType = LucideCalendar;
   protected readonly chartBarIcon: IconType = LucideChartBar;
   protected readonly checkIcon: IconType = LucideCheck;
-  protected readonly botIcon: IconType = LucideBot;
   protected readonly bookOpenIcon: IconType = LucideBookOpen;
   protected readonly lightbulbIcon: IconType = LucideLightbulb;
   protected readonly triangleAlertIcon: IconType = LucideTriangleAlert;
@@ -73,6 +71,7 @@ export class DashboardHome implements OnInit {
       icon: LucideGraduationCap,
       color: 'blue',
       route: '/dashboard/trainees',
+      action: 'navigate',
       enabled: true
     },
     {
@@ -81,6 +80,7 @@ export class DashboardHome implements OnInit {
       icon: LucideUsers,
       color: 'purple',
       route: '/trainer',
+      action: 'navigate',
       enabled: true
     },
     {
@@ -88,7 +88,7 @@ export class DashboardHome implements OnInit {
       description: 'Ask questions and retrieve training information using natural language.',
       icon: LucideBot,
       color: 'cyan',
-      action: 'scroll',
+      action: 'open-copilot',
       enabled: true
     },
     {
@@ -97,6 +97,7 @@ export class DashboardHome implements OnInit {
       icon: LucideBell,
       color: 'orange',
       route: '/alerts',
+      action: 'navigate',
       enabled: true
     },
     {
@@ -105,6 +106,7 @@ export class DashboardHome implements OnInit {
       icon: LucideLightbulb,
       color: 'green',
       route: '/recommendations',
+      action: 'navigate',
       enabled: true
     },
     {
@@ -113,6 +115,7 @@ export class DashboardHome implements OnInit {
       icon: LucideChartBar,
       color: 'pink',
       route: '/dashboard/analytics',
+      action: 'navigate',
       enabled: true
     },
     {
@@ -121,41 +124,24 @@ export class DashboardHome implements OnInit {
       icon: LucideSettings,
       color: 'yellow',
       route: '/course-optimization',
+      action: 'navigate',
       enabled: true
     }
   ]);
 
   // ── Top summary stats ──────────────────────────────────────────────────
-  // Active Courses & Completed come from GET /api/analytics/dashboard.
-  // Overall Progress uses avg_score from the same endpoint (per your choice).
-  // Upcoming is repurposed as "Upcoming Batches" via GET /api/batches?status=upcoming
-  // — there's no "upcoming courses" concept on the backend, only batches.
   protected readonly overview = signal<DashboardOverview | null>(null);
   protected readonly upcomingBatchCount = signal<number | null>(null);
   protected readonly summaryLoading = signal(true);
 
-  protected readonly chatMessages = signal<ChatMessage[]>([]);
-  protected readonly chatDraft = signal('');
-  protected readonly sendingMessage = signal(false);
-  protected readonly chatError = signal<string | null>(null);
-
-  private readonly copilotSection = viewChild<ElementRef<HTMLElement>>('copilotSection');
-
   constructor(
     private router: Router,
-    private chatService: ChatService,
     private analyticsService: AnalyticsService,
     private batchesService: BatchesService,
+    private copilotService: CopilotWidgetService,
   ) {}
 
   ngOnInit(): void {
-    this.chatService.getHistory().subscribe({
-      next: (messages) => {
-        this.chatMessages.set(messages.slice(-4));
-      },
-      error: (err) => console.error('Failed to load chat history', err),
-    });
-
     this.analyticsService.getDashboard().subscribe({
       next: (overview) => {
         this.overview.set(overview);
@@ -177,53 +163,12 @@ export class DashboardHome implements OnInit {
   }
 
   protected handleCardClick(card: DashboardCard): void {
-    if (card.action === 'scroll') {
-      this.scrollToCopilot();
+    if (card.action === 'open-copilot') {
+      if (!this.copilotService.open()) this.copilotService.toggle();
       return;
     }
     if (card.route) {
       this.router.navigate([card.route]);
     }
-  }
-
-  private scrollToCopilot(): void {
-    this.copilotSection()?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  protected newChat(): void {
-    this.chatMessages.set([]);
-    this.chatDraft.set('');
-    this.chatError.set(null);
-    this.sendingMessage.set(false);
-  }
-
-  protected askCopilot(): void {
-    const message = this.chatDraft().trim();
-    if (!message || this.sendingMessage()) return;
-
-    this.sendingMessage.set(true);
-    this.chatError.set(null);
-
-    const optimisticUserMsg: ChatMessage = {
-      id: -Date.now(),
-      trainer_id: null,
-      role: 'user',
-      content: message,
-      created_at: new Date().toISOString(),
-    };
-    this.chatMessages.update(msgs => [...msgs, optimisticUserMsg].slice(-4));
-    this.chatDraft.set('');
-
-    this.chatService.sendMessage({ message }).subscribe({
-      next: (reply) => {
-        this.chatMessages.update(msgs => [...msgs, reply].slice(-4));
-        this.sendingMessage.set(false);
-      },
-      error: (err) => {
-        console.error('Copilot request failed', err);
-        this.chatError.set('Copilot is unavailable right now — try again shortly.');
-        this.sendingMessage.set(false);
-      },
-    });
   }
 }
